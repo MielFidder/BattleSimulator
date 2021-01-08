@@ -17,7 +17,7 @@
 #define MAX_FRAMES 2000
 
 //Global performance timer
-#define REF_PERFORMANCE 73466 //UPDATE THIS WITH YOUR REFERENCE PERFORMANCE (see console after 2k frames)
+#define REF_PERFORMANCE 56450 //UPDATE THIS WITH YOUR REFERENCE PERFORMANCE (see console after 2k frames)
 static timer perf_timer;
 static float duration;
 
@@ -264,6 +264,8 @@ void Game::draw()
 
         const int begin = ((t < 1) ? 0 : NUM_TANKS_BLUE);
         std::vector<const Tank*> sorted_tanks;
+        //merge_sort_tanks_health(tanks, sorted_tanks, begin, begin + NUM_TANKS);
+        
         insertion_sort_tanks_health(tanks, sorted_tanks, begin, begin + NUM_TANKS);
 
         for (int i = 0; i < NUM_TANKS; i++)
@@ -274,13 +276,14 @@ void Game::draw()
             int health_bar_end_y = (t < 1) ? HEALTH_BAR_HEIGHT : SCRHEIGHT - 1;
 
             screen->bar(health_bar_start_x, health_bar_start_y, health_bar_end_x, health_bar_end_y, REDMASK);
-            screen->bar(health_bar_start_x, health_bar_start_y + (int)((double)HEALTH_BAR_HEIGHT * (1 - ((double)sorted_tanks.at(i)->health / (double)TANK_MAX_HEALTH))), health_bar_end_x, health_bar_end_y, GREENMASK);
+            screen->bar(health_bar_start_x, health_bar_start_y + (int)((double)HEALTH_BAR_HEIGHT * (1 - ((double)sorted_tanks.at(i)->health / (double)TANK_MAX_HEALTH))), health_bar_end_x, health_bar_end_y, GREENMASK);//
         }
     }
 }
 
 // -----------------------------------------------------------
 // Sort tanks by health value using insertion sort
+// Hier moeten we Merge Sort van maken!
 // -----------------------------------------------------------
 void Tmpl8::Game::insertion_sort_tanks_health(const std::vector<Tank>& original, std::vector<const Tank*>& sorted_tanks, int begin, int end)
 {
@@ -309,6 +312,66 @@ void Tmpl8::Game::insertion_sort_tanks_health(const std::vector<Tank>& original,
             }
         }
     }
+}
+// Merge
+vector<const Tank*> Tmpl8::Game::merge_tanks_health(std::vector<Tank>& v1, std::vector<Tank>& v2, std::vector<const Tank*>& sorted_tanks, int begin, int end) {
+    
+    std::vector<const Tank*> result;
+
+
+    while (v1.size() > 0 || v2.size() > 0) {
+        if (v1.size() > 0 && v2.size() > 0) {
+            if (v1.at(0).health <= v2.at(0).health) {
+                result.push_back(v1.front());
+                v1.erase(v1.begin());
+            }
+            else {
+                result.push_back(v2.front());
+                v2.erase(v2.begin());
+            }
+        }
+        else if (v1.size() > 0) {
+            for (int i = 0; i < v1.size(); i++)
+                result.push_back(v1.at(i));
+            break;
+        }
+        else if (v2.size() > 0) {
+            for (int i = 0; i < v2.size(); i++)
+                result.push_back(v2.at(i));
+            break;
+        }
+    }
+
+    return result;
+    //sorted_tanks = result;
+}
+
+// Merge Sort
+vector<const Tank*> Tmpl8::Game::merge_sort_tanks_health(const std::vector<Tank*> allTanks, std::vector<const Tank*>& sorted_tanks, int begin, int end) {
+    
+    const int NUM_TANKS = end - begin;
+    sorted_tanks.reserve(NUM_TANKS);
+    sorted_tanks.emplace_back(&allTanks.at(begin));
+
+    if (sorted_tanks.size() <= 1) {
+        return sorted_tanks;
+    }
+
+    std::vector<Tank*> left;
+    std::vector<Tank*> right;
+
+    int middle = sorted_tanks.size() / 2;
+    for (int i = 0; i < middle; i++) {
+        left.push_back(sorted_tanks[i]);
+    }
+    for (int i = middle; i < sorted_tanks.size(); i++) {
+        right.push_back(sorted_tanks[i]);
+    }
+
+    left = merge_sort_tanks_health(left, sorted_tanks, begin, end);
+    right = merge_sort_tanks_health(right, sorted_tanks, begin, end);
+    return merge_tanks_health(left, right, sorted_tanks, begin, end);
+
 }
 
 // -----------------------------------------------------------

@@ -52,6 +52,11 @@ const static float rocket_radius = 10.f;
 void Game::init()
 {
 
+    kdtree = new Node();
+    int points[][2] = { {3,6}, {10,1} };
+    kdtree->insert(kdtree, points[0]);
+    int pointtofind[] = {3,6};
+
     frame_count_font = new Font("assets/digital_small.png", "ABCDEFGHIJKLMNOPQRSTUVWXYZ:?!=-0123456789.");
 
     tanks.reserve(NUM_TANKS_BLUE + NUM_TANKS_RED);
@@ -89,6 +94,13 @@ void Game::init()
 void Game::shutdown()
 {
 }
+
+
+void Tmpl8::Game::fillKDTree(const std::vector<Tank*> allTanks)
+{
+
+}
+
 
 // -----------------------------------------------------------
 // Iterates through all tanks and returns the closest enemy tank for the given tank
@@ -317,7 +329,7 @@ void Tmpl8::Game::insertion_sort_tanks_health(const std::vector<Tank>& original,
 // Merge
 vector<const Tank*> Tmpl8::Game::merge_tanks_health(std::vector<Tank>& v1, std::vector<Tank>& v2, std::vector<const Tank*>& sorted_tanks, int begin, int end) {
     
-    std::vector<const Tank*> result;
+   /* std::vector<const Tank*> result;
 
 
     while (v1.size() > 0 || v2.size() > 0) {
@@ -343,14 +355,14 @@ vector<const Tank*> Tmpl8::Game::merge_tanks_health(std::vector<Tank>& v1, std::
         }
     }
 
-    return result;
+    return result;*/
     //sorted_tanks = result;
 }
 
 // Merge Sort
 vector<const Tank*> Tmpl8::Game::merge_sort_tanks_health(const std::vector<Tank*> allTanks, std::vector<const Tank*>& sorted_tanks, int begin, int end) {
     
-    const int NUM_TANKS = end - begin;
+    /*const int NUM_TANKS = end - begin;
     sorted_tanks.reserve(NUM_TANKS);
     sorted_tanks.emplace_back(&allTanks.at(begin));
 
@@ -358,8 +370,8 @@ vector<const Tank*> Tmpl8::Game::merge_sort_tanks_health(const std::vector<Tank*
         return sorted_tanks;
     }
 
-    std::vector<Tank*> left;
-    std::vector<Tank*> right;
+    const std::vector<Tank*> left;
+    const std::vector<Tank*> right;
 
     int middle = sorted_tanks.size() / 2;
     for (int i = 0; i < middle; i++) {
@@ -371,7 +383,7 @@ vector<const Tank*> Tmpl8::Game::merge_sort_tanks_health(const std::vector<Tank*
 
     left = merge_sort_tanks_health(left, sorted_tanks, begin, end);
     right = merge_sort_tanks_health(right, sorted_tanks, begin, end);
-    return merge_tanks_health(left, right, sorted_tanks, begin, end);
+    return merge_tanks_health(left, right, sorted_tanks, begin, end);*/
 
 }
 

@@ -25,7 +25,7 @@ struct Node* Node::NewNode(int arr[]) {
 	return temp;
 }
 
-Node* Node::insertRec(Node* root, int point[], unsigned depth) {
+Node* Node::insertRec(Node* root, int point[], unsigned int depth) {
 	if (root == NULL) {
 		return NewNode(point);
 	}
@@ -48,7 +48,7 @@ Node* Node::insert(Node* root, int point[]) {
 	return insertRec(root, point, 0);
 }
 
-bool Node::searchRec(Node* root, int point[], unsigned depth)
+bool Node::searchRec(Node* root, int point[], unsigned int depth)
 {
 	// Base cases 
 	if (root == NULL)

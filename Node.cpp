@@ -10,6 +10,14 @@ Node::Node()
 	point[k];
 }
 
+Node::Node(int pos[]) {
+	left = NULL;
+	right = NULL;
+	point[k];
+
+	insert(pos);
+}
+
 Node::~Node()
 {
 }
@@ -26,7 +34,7 @@ struct Node* Node::NewNode(int arr[]) {
 }
 
 Node* Node::insertRec(Node* root, int point[], unsigned int depth) {
-	if (root == NULL) {
+	if (this == NULL) {
 		return NewNode(point);
 	}
 
@@ -34,32 +42,32 @@ Node* Node::insertRec(Node* root, int point[], unsigned int depth) {
 	unsigned cd = depth % k;
 
 	//decide left or right
-	if (point[cd] < (root->point[cd])) {
-		root->left = insertRec(root->left, point, depth + 1);
+	if (point[cd] < (this->point[cd])) {
+		this->left = insertRec(root->left, point, depth + 1);
 	}
 	else {
-		root->right = insertRec(root->right, point, depth + 1);
+		this->right = insertRec(root->right, point, depth + 1);
 	}
-	return root;
+	return this;
 }
 
 //insert new point at point in tree
-Node* Node::insert(Node* root, int point[]) {
-	return insertRec(root, point, 0);
+Node* Node::insert(int point[]) {
+	return insertRec(this, point, 0);
 }
 
 bool Node::searchRec(Node* root, int point[], unsigned int depth)
 {
 	// Base cases 
-	if (root == NULL)
+	if (this == NULL)
 		return false;
-	if (arePointsSame(root->point, point))
+	if (arePointsSame(this->point, point))
 		return true;
 
 	unsigned cd = depth % k;
 
-	// Compare point with root 
-	if (point[cd] < root->point[cd]) {
+	// Compare point with this 
+	if (point[cd] < this->point[cd]) {
 		return searchRec(root->left, point, depth + 1);
 	}
 
@@ -68,10 +76,10 @@ bool Node::searchRec(Node* root, int point[], unsigned int depth)
 
 // Searches a Point in the K D tree. It mainly uses 
 // searchRec() 
-bool Node::search(Node* root, int point[])
+bool Node::search(int point[])
 {
 	// Pass current depth as 0 
-	return searchRec(root, point, 0);
+	return searchRec(this, point, 0);
 }
 
 bool Node::arePointsSame(int point1[], int point2[]) {

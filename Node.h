@@ -7,14 +7,15 @@ public:
 	int point[];
 
 	Node();
+	Node(int pos[]);
 	~Node();
 
 	Node* NewNode(int arr[]);
 
 	Node* insertRec(Node* root, int point[], unsigned int depth);
-	Node* insert(Node* root, int point[]);
+	Node* insert(int point[]);
 	bool searchRec(Node* root, int point[], unsigned int depth);
-	bool search(Node* root, int point[]);
+	bool search(int point[]);
 	bool arePointsSame(int point1[], int point2[]);
 private:
 };

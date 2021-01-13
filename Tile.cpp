@@ -3,7 +3,11 @@
 
 Tile::Tile()
 {
-	
+}
+
+Tile::Tile(vec2 position)
+{
+	this->position = position;
 }
 
 Tile::~Tile()

@@ -33,6 +33,7 @@ class Tank
 
     void push(vec2 direction, float magnitude);
 
+    Tile currentTile = NULL;
 
     vec2 position;
     vec2 speed;

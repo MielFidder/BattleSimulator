@@ -6,7 +6,7 @@ Grid::Grid()
 	CreateGrid(vec2(5,5));
 }
 
-Grid::Grid(vec2 gsize, vector<Tank*> tanks)
+Grid::Grid(vec2 gsize, vector<Tank> tanks)
 {
 	this->tanks = tanks;
 	CreateGrid(gsize);

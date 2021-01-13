@@ -22,6 +22,7 @@ class Game
     void merge_tanks_health(std::vector<Tank*> v1, std::vector<Tank*> v2, std::vector<Tank*>& sorted_tanks, int begin, int end);
     void measure_performance();
 
+
     Tank& find_closest_enemy(Tank& current_tank);
 
     void fillKDTree(const std::vector<Tank*> allTanks);

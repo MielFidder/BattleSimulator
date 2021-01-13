@@ -24,6 +24,8 @@ class Game
 
     Tank& find_closest_enemy(Tank& current_tank);
 
+    void fillKDTree(const std::vector<Tank*> allTanks);
+
     void mouse_up(int button)
     { /* implement if you want to detect mouse button presses */
     }
@@ -46,6 +48,8 @@ class Game
 
   private:
     Surface* screen;
+
+    Node* kdtree;
 
     vector<Tank> tanks;
     vector<Rocket> rockets;

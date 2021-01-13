@@ -51,6 +51,12 @@ const static float rocket_radius = 10.f;
 // -----------------------------------------------------------
 void Game::init()
 {
+
+    kdtree = new Node();
+    int points[][2] = { {3,6}, {10,1} };
+    kdtree->insert(kdtree, points[0]);
+    int pointtofind[] = {3,6};
+
     frame_count_font = new Font("assets/digital_small.png", "ABCDEFGHIJKLMNOPQRSTUVWXYZ:?!=-0123456789.");
 
     tanks.reserve(NUM_TANKS_BLUE + NUM_TANKS_RED);
@@ -88,6 +94,13 @@ void Game::init()
 void Game::shutdown()
 {
 }
+
+
+void Tmpl8::Game::fillKDTree(const std::vector<Tank*> allTanks)
+{
+
+}
+
 
 // -----------------------------------------------------------
 // Iterates through all tanks and returns the closest enemy tank for the given tank

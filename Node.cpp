@@ -1,8 +1,6 @@
 #include "precomp.h"
 #include "Node.h"
 
-
-
 Node::Node()
 {
 	left = NULL;

@@ -14,6 +14,8 @@
     <ClCompile Include="particle_beam.cpp" />
     <ClCompile Include="explosion.cpp" />
     <ClCompile Include="Node.cpp" />
+    <ClCompile Include="Grid.cpp" />
+    <ClCompile Include="Tile.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="game.h" />
@@ -31,6 +33,8 @@
     <ClInclude Include="ThreadPool.h" />
     <ClInclude Include="explosion.h" />
     <ClInclude Include="Node.h" />
+    <ClInclude Include="Grid.h" />
+    <ClInclude Include="Tile.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="template code">

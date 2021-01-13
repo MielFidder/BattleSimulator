@@ -19,3 +19,4 @@ public:
 	bool arePointsSame(int point1[], int point2[]);
 private:
 };
+

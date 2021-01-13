@@ -1,5 +1,7 @@
 #pragma once
 
+class Tile;
+
 namespace Tmpl8
 {
 
@@ -33,7 +35,7 @@ class Tank
 
     void push(vec2 direction, float magnitude);
 
-    Tile currentTile = NULL;
+    Tile* currentTile;
 
     vec2 position;
     vec2 speed;

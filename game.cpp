@@ -17,7 +17,7 @@
 #define MAX_FRAMES 2000
 
 //Global performance timer
-#define REF_PERFORMANCE 65368 //UPDATE THIS WITH YOUR REFERENCE PERFORMANCE (see console after 2k frames)
+#define REF_PERFORMANCE 63648 //UPDATE THIS WITH YOUR REFERENCE PERFORMANCE (see console after 2k frames)
 static timer perf_timer;
 static float duration;
 
@@ -52,10 +52,10 @@ const static float rocket_radius = 10.f;
 void Game::init()
 {
 
-    kdtree = new Node();
+    /*kdtree = new Node();
     int points[][2] = { {3,6}, {10,1} };
-    kdtree->insert(kdtree, points[0]);
-    int pointtofind[] = {3,6};
+    kdtree->insert(points[0]);
+    int pointtofind[] = {3,6};*/
 
     frame_count_font = new Font("assets/digital_small.png", "ABCDEFGHIJKLMNOPQRSTUVWXYZ:?!=-0123456789.");
 
@@ -201,6 +201,33 @@ void Game::update(float deltaTime)
         }
     }
 
+    //Update rockets door Miel
+    //for (Rocket& rocket : rockets)
+    //{
+    //    rocket.tick();
+
+    //    //Intersects?
+    //    if(rocket.intersects()){
+    //        
+    //        //tank active?
+    //        if (tank.active) {
+    //            //andere kleur?
+    //            if (tank.allignment != rocket.allignment) {
+    //                //BOOM
+    //                explosions.push_back(Explosion(&explosion, tank.position));
+
+    //                if (tank.hit(ROCKET_HIT_VALUE))
+    //                {
+    //                    smokes.push_back(Smoke(smoke, tank.position - vec2(0, 48)));
+    //                }
+
+    //                rocket.active = false;
+    //                break;
+    //            }
+    //        }
+    //    }
+    //}
+
     //Remove exploded rockets with remove erase idiom
     rockets.erase(std::remove_if(rockets.begin(), rockets.end(), [](const Rocket& rocket) { return !rocket.active; }), rockets.end());
 
@@ -301,34 +328,34 @@ void Game::draw()
 // -----------------------------------------------------------
 // Sort tanks by health value using insertion sort
 // -----------------------------------------------------------
-void Tmpl8::Game::insertion_sort_tanks_health(const std::vector<Tank>& original, std::vector<const Tank*>& sorted_tanks, int begin, int end)
-{
-    const int NUM_TANKS = end - begin;
-    sorted_tanks.reserve(NUM_TANKS);
-    sorted_tanks.emplace_back(&original.at(begin));
-
-    for (int i = begin + 1; i < (begin + NUM_TANKS); i++)
-    {
-        const Tank& current_tank = original.at(i);
-
-        for (int s = (int)sorted_tanks.size() - 1; s >= 0; s--)
-        {
-            const Tank* current_checking_tank = sorted_tanks.at(s);
-
-            if ((current_checking_tank->compare_health(current_tank) <= 0))
-            {
-                sorted_tanks.insert(1 + sorted_tanks.begin() + s, &current_tank);
-                break;
-            }
-
-            if (s == 0)
-            {
-                sorted_tanks.insert(sorted_tanks.begin(), &current_tank);
-                break;
-            }
-        }
-    }
-}
+//void Tmpl8::Game::insertion_sort_tanks_health(const std::vector<Tank>& original, std::vector<const Tank*>& sorted_tanks, int begin, int end)
+//{
+//    const int NUM_TANKS = end - begin;
+//    sorted_tanks.reserve(NUM_TANKS);
+//    sorted_tanks.emplace_back(&original.at(begin));
+//
+//    for (int i = begin + 1; i < (begin + NUM_TANKS); i++)
+//    {
+//        const Tank& current_tank = original.at(i);
+//
+//        for (int s = (int)sorted_tanks.size() - 1; s >= 0; s--)
+//        {
+//            const Tank* current_checking_tank = sorted_tanks.at(s);
+//
+//            if ((current_checking_tank->compare_health(current_tank) <= 0))
+//            {
+//                sorted_tanks.insert(1 + sorted_tanks.begin() + s, &current_tank);
+//                break;
+//            }
+//
+//            if (s == 0)
+//            {
+//                sorted_tanks.insert(sorted_tanks.begin(), &current_tank);
+//                break;
+//            }
+//        }
+//    }
+//}
 
 
 // Merge

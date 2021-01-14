@@ -21,7 +21,7 @@ void Grid::CreateGrid(vec2 gsize)
 	this->gsize = gsize;
 
 	for (int i = 0; i < gsize.x; i++) {
-		for (int y = 0; y < gsize.y; i++) {
+		for (int y = 0; y < gsize.y; y++) {
 			Tile* t = new Tile(vec2(i, y));
 			tiles.push_back(t);
 		}

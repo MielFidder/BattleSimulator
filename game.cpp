@@ -86,7 +86,8 @@ void Game::init()
     particle_beams.push_back(Particle_beam(vec2(80, 80), vec2(100, 50), &particle_beam_sprite, PARTICLE_BEAM_HIT_VALUE));
     particle_beams.push_back(Particle_beam(vec2(1200, 600), vec2(100, 50), &particle_beam_sprite, PARTICLE_BEAM_HIT_VALUE));
 
-    Grid* grid = new Grid(vec2(7,9), tanks);
+    grid = new Grid(vec2(7,9), tanks);
+    FillGrid();
 }
 
 // -----------------------------------------------------------
@@ -97,9 +98,23 @@ void Game::shutdown()
 }
 
 
-void Tmpl8::Game::fillKDTree(const std::vector<Tank*> allTanks)
+void Tmpl8::Game::FillGrid()
 {
+    int index = 0;
+    for (int i = 0; i < tanks.size(); i++) {
+        float tsizeX = SCRWIDTH / grid->GetGsize().x;
+        float tsizeY = SCRHEIGHT / grid->GetGsize().y;
 
+        int indexX = floor(tanks[i].position.x / tsizeX);
+        int indexY = floor(tanks[i].position.y / tsizeY);
+
+        index = (indexX * indexY);
+        if (index > 0)
+            index--;
+
+        grid->getTiles()[index]->AddToTanks(tanks[i]);
+    }
+    cout << "done" << endl;
 }
 
 
@@ -180,53 +195,53 @@ void Game::update(float deltaTime)
     }
 
     //Update rockets
-    //for (Rocket& rocket : rockets)
-    //{
-    //    rocket.tick();
-
-    //    //Check if rocket collides with enemy tank, spawn explosion and if tank is destroyed spawn a smoke plume
-    //    for (Tank& tank : tanks)
-    //    {
-    //        if (tank.active && (tank.allignment != rocket.allignment) && rocket.intersects(tank.position, tank.collision_radius))
-    //        {
-    //            explosions.push_back(Explosion(&explosion, tank.position));
-
-    //            if (tank.hit(ROCKET_HIT_VALUE))
-    //            {
-    //                smokes.push_back(Smoke(smoke, tank.position - vec2(0, 48)));
-    //            }
-
-    //            rocket.active = false;
-    //            break;
-    //        }
-    //    }
-    //}
-
-    //Update rockets door Miel
     for (Rocket& rocket : rockets)
     {
         rocket.tick();
 
-        vector<Tank*> tile_tanks = rocket.get_currentTile()->GetTanks();
+        //Check if rocket collides with enemy tank, spawn explosion and if tank is destroyed spawn a smoke plume
+        for (Tank& tank : tanks)
+        {
+            if (tank.active && (tank.allignment != rocket.allignment) && rocket.intersects(tank.position, tank.collision_radius))
+            {
+                explosions.push_back(Explosion(&explosion, tank.position));
 
-        for (Tank* tank : tile_tanks) {
-            if (tank->active) {
-                //andere kleur?
-                if (tank->allignment != rocket.allignment) {
-                    //BOOM
-                    explosions.push_back(Explosion(&explosion, tank->position));
-
-                    if (tank->hit(ROCKET_HIT_VALUE))
-                    {
-                        smokes.push_back(Smoke(smoke, tank->position - vec2(0, 48)));
-                    }
-
-                    rocket.active = false;
-                    break;
+                if (tank.hit(ROCKET_HIT_VALUE))
+                {
+                    smokes.push_back(Smoke(smoke, tank.position - vec2(0, 48)));
                 }
+
+                rocket.active = false;
+                break;
             }
         }
     }
+
+    //Update rockets door Miel
+    //for (Rocket& rocket : rockets)
+    //{
+    //    rocket.tick();
+
+    //    vector<Tank*> tile_tanks = rocket.get_currentTile()->GetTanks();
+
+    //    for (Tank* tank : tile_tanks) {
+    //        if (tank->active) {
+    //            //andere kleur?
+    //            if (tank->allignment != rocket.allignment) {
+    //                //BOOM
+    //                explosions.push_back(Explosion(&explosion, tank->position));
+
+    //                if (tank->hit(ROCKET_HIT_VALUE))
+    //                {
+    //                    smokes.push_back(Smoke(smoke, tank->position - vec2(0, 48)));
+    //                }
+
+    //                rocket.active = false;
+    //                break;
+    //            }
+    //        }
+    //    }
+    //}
 
     //Remove exploded rockets with remove erase idiom
     rockets.erase(std::remove_if(rockets.begin(), rockets.end(), [](const Rocket& rocket) { return !rocket.active; }), rockets.end());

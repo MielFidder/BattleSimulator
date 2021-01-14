@@ -25,7 +25,7 @@ class Game
 
     Tank& find_closest_enemy(Tank& current_tank);
 
-    void fillKDTree(const std::vector<Tank*> allTanks);
+    void FillGrid();
 
     void mouse_up(int button)
     { /* implement if you want to detect mouse button presses */
@@ -57,6 +57,8 @@ class Game
     vector<Smoke> smokes;
     vector<Explosion> explosions;
     vector<Particle_beam> particle_beams;
+
+    Grid* grid;
 
     Font* frame_count_font;
     long long frame_count = 0;

@@ -101,12 +101,22 @@ void Game::shutdown()
 void Tmpl8::Game::FillGrid()
 {
     int index = 0;
-    for (int i = 0; i < tanks.size(); i++) {
+    for (int i = 0; i < (int)tanks.size(); i++) {
         float tsizeX = SCRWIDTH / grid->GetGsize().x;
         float tsizeY = SCRHEIGHT / grid->GetGsize().y;
 
-        int indexX = floor(tanks[i].position.x / tsizeX);
-        int indexY = floor(tanks[i].position.y / tsizeY);
+        int indexX;
+        int indexY;
+
+        if (tanks[i].position.x > SCRWIDTH) {
+            indexX = grid->GetGsize().x;
+        }else
+            indexX = floor(tanks[i].position.x / tsizeX);
+
+        if (tanks[i].position.y > SCRHEIGHT) {
+            indexY = grid->GetGsize().y;
+        }else
+            indexY = floor(tanks[i].position.y / tsizeY);
 
         index = (indexX * indexY);
         if (index > 0)
@@ -141,6 +151,31 @@ Tank& Game::find_closest_enemy(Tank& current_tank)
 
     return tanks.at(closest_index);
 }
+
+// Return closed enemy door Miel
+//Tank& Game::find_closest_enemy(Tank& current_tank) {
+//    vector<Tank*> tileTanks = current_tank.currentTile->GetTanks();
+//    float closest_distance = numeric_limits<float>::infinity();
+//    int closest_index = 0;
+//
+//    Tank* closed_tank;
+//
+//    for (int i = 0; i < (int)tileTanks.size(); i++)
+//    {
+//        if (tanks.at(i).allignment != current_tank.allignment && tanks.at(i).active)
+//        {
+//            float sqrDist = fabsf((tanks.at(i).get_position() - current_tank.get_position()).sqr_length());
+//            if (sqrDist < closest_distance)
+//            {
+//                closest_distance = sqrDist;
+//                closest_index = i;
+//                closed_tank = tileTanks.at(i);
+//            }
+//        }
+//    }
+//
+//    return *closed_tank;
+//}
 
 // -----------------------------------------------------------
 // Update the game state:
@@ -217,31 +252,30 @@ void Game::update(float deltaTime)
         }
     }
 
+
     //Update rockets door Miel
-    //for (Rocket& rocket : rockets)
-    //{
-    //    rocket.tick();
+    /*for (Rocket& rocket : rockets)
+    {
+        rocket.tick();
 
-    //    vector<Tank*> tile_tanks = rocket.get_currentTile()->GetTanks();
+        vector<Tank*> tile_tanks = rocket.get_currentTile()->GetTanks();
 
-    //    for (Tank* tank : tile_tanks) {
-    //        if (tank->active) {
-    //            //andere kleur?
-    //            if (tank->allignment != rocket.allignment) {
-    //                //BOOM
-    //                explosions.push_back(Explosion(&explosion, tank->position));
+        for (Tank* tank : tile_tanks) {
+            if (tank->active) {
+                if (tank->allignment != rocket.allignment) {
+                    explosions.push_back(Explosion(&explosion, tank->position));
 
-    //                if (tank->hit(ROCKET_HIT_VALUE))
-    //                {
-    //                    smokes.push_back(Smoke(smoke, tank->position - vec2(0, 48)));
-    //                }
+                    if (tank->hit(ROCKET_HIT_VALUE))
+                    {
+                        smokes.push_back(Smoke(smoke, tank->position - vec2(0, 48)));
+                    }
 
-    //                rocket.active = false;
-    //                break;
-    //            }
-    //        }
-    //    }
-    //}
+                    rocket.active = false;
+                    break;
+                }
+            }
+        }
+    }*/
 
     //Remove exploded rockets with remove erase idiom
     rockets.erase(std::remove_if(rockets.begin(), rockets.end(), [](const Rocket& rocket) { return !rocket.active; }), rockets.end());

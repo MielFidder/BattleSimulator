@@ -51,7 +51,7 @@ void Grid::CheckTanksTiles()
 				if (index > 0)
 					index--;
 
-				Tank t = tiles[i]->GetTanks[z];
+				Tank t = tiles[i]->GetTanks()[z];
 
 				tiles[index]->AddToTanks(t);
 				tiles[i]->RemoveFromTanks(t);

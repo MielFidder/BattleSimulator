@@ -1,6 +1,6 @@
 #include "precomp.h"
 #pragma once
-
+ 
 class Grid
 {
 public:
@@ -9,11 +9,10 @@ public:
 	~Grid();
 
 	void CreateGrid(vec2 gsize);
+	void CheckTanksTiles();
 	vec2 GetGsize() { return gsize; }
 	vector<Tile*> getTiles() { return tiles; }
 private:
-	void UpdateTankTiles();
-
 	vec2 gsize = NULL;
 	vector<Tile*> tiles;
 	vector<Tank> tanks;

@@ -100,11 +100,12 @@ void Game::shutdown()
 
 void Tmpl8::Game::FillGrid()
 {
+    float tsizeX = SCRWIDTH / grid->GetGsize().x;
+    float tsizeY = SCRHEIGHT / grid->GetGsize().y;
+
     int index = 0;
     for (int i = 0; i < (int)tanks.size(); i++) {
-        float tsizeX = SCRWIDTH / grid->GetGsize().x;
-        float tsizeY = SCRHEIGHT / grid->GetGsize().y;
-
+        
         int indexX;
         int indexY;
 
@@ -186,6 +187,9 @@ Tank& Game::find_closest_enemy(Tank& current_tank)
 // -----------------------------------------------------------
 void Game::update(float deltaTime)
 {
+    //update grid
+    grid->CheckTanksTiles();
+
     //Update tanks
     for (Tank& tank : tanks)
     {

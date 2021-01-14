@@ -86,7 +86,7 @@ void Game::init()
     particle_beams.push_back(Particle_beam(vec2(80, 80), vec2(100, 50), &particle_beam_sprite, PARTICLE_BEAM_HIT_VALUE));
     particle_beams.push_back(Particle_beam(vec2(1200, 600), vec2(100, 50), &particle_beam_sprite, PARTICLE_BEAM_HIT_VALUE));
 
-    grid = new Grid(vec2(7,9), tanks);
+    grid = new Grid(vec2(GRIDROW, GRIDCOL), tanks);
     FillGrid();
 }
 
@@ -124,6 +124,7 @@ void Tmpl8::Game::FillGrid()
             index--;
 
         grid->getTiles()[index]->AddToTanks(tanks[i]);
+        tanks[i].setCurrentTileIndex(index);
     }
     cout << "done" << endl;
 }
@@ -132,12 +133,58 @@ void Tmpl8::Game::FillGrid()
 // -----------------------------------------------------------
 // Iterates through all tanks and returns the closest enemy tank for the given tank
 // -----------------------------------------------------------
-Tank& Game::find_closest_enemy(Tank& current_tank)
-{
+//Tank& Game::find_closest_enemy(Tank& current_tank)
+//{
+    //float closest_distance = numeric_limits<float>::infinity();
+    //int closest_index = 0;
+
+    //for (int i = 0; i < tanks.size(); i++)
+    //{
+    //    if (tanks.at(i).allignment != current_tank.allignment && tanks.at(i).active)
+    //    {
+    //        float sqrDist = fabsf((tanks.at(i).get_position() - current_tank.get_position()).sqr_length());
+    //        if (sqrDist < closest_distance)
+    //        {
+    //            closest_distance = sqrDist;
+    //            closest_index = i;
+    //        }
+    //    }
+    //}
+
+    //return tanks.at(closest_index);
+//}
+
+// Return closest enemy door Miel
+Tank& Game::find_closest_enemy(Tank& current_tank) {
+    
+    vector<Tank> closest_tanks;
+    Tank closest_tank = current_tank;
     float closest_distance = numeric_limits<float>::infinity();
     int closest_index = 0;
 
-    for (int i = 0; i < tanks.size(); i++)
+    int tileIndex = current_tank.currentTile;
+
+    vector<Tile*> surroundingTiles = grid->GetSurroundedTiles(tileIndex);
+
+    for (int i = 0; i < (int)surroundingTiles.size(); i++) {
+        vector<Tank> tileTanks = grid->getTiles()[tileIndex]->GetTanks();
+
+        for (int i = 0; i < (int)tileTanks.size(); i++)
+        {
+            if (tanks.at(i).allignment != current_tank.allignment && tanks.at(i).active)
+            {
+                float sqrDist = fabsf((tanks.at(i).get_position() - current_tank.get_position()).sqr_length());
+                if (sqrDist < closest_distance)
+                {
+                    closest_distance = sqrDist;
+                    closest_index = i;
+                    closest_tanks.push_back(tileTanks[i]);
+                }
+            }
+        }
+    }
+
+    for (int i = 0; i < (int)closest_tanks.size(); i++)
     {
         if (tanks.at(i).allignment != current_tank.allignment && tanks.at(i).active)
         {
@@ -146,37 +193,13 @@ Tank& Game::find_closest_enemy(Tank& current_tank)
             {
                 closest_distance = sqrDist;
                 closest_index = i;
+                closest_tank = closest_tanks[i];
             }
         }
     }
-
-    return tanks.at(closest_index);
+    
+    return closest_tank;
 }
-
-// Return closed enemy door Miel
-//Tank& Game::find_closest_enemy(Tank& current_tank) {
-//    vector<Tank*> tileTanks = current_tank.currentTile->GetTanks();
-//    float closest_distance = numeric_limits<float>::infinity();
-//    int closest_index = 0;
-//
-//    Tank* closed_tank;
-//
-//    for (int i = 0; i < (int)tileTanks.size(); i++)
-//    {
-//        if (tanks.at(i).allignment != current_tank.allignment && tanks.at(i).active)
-//        {
-//            float sqrDist = fabsf((tanks.at(i).get_position() - current_tank.get_position()).sqr_length());
-//            if (sqrDist < closest_distance)
-//            {
-//                closest_distance = sqrDist;
-//                closest_index = i;
-//                closed_tank = tileTanks.at(i);
-//            }
-//        }
-//    }
-//
-//    return *closed_tank;
-//}
 
 // -----------------------------------------------------------
 // Update the game state:
@@ -220,7 +243,10 @@ void Game::update(float deltaTime)
             {
                 Tank& target = find_closest_enemy(tank);
 
-                rockets.push_back(Rocket(tank.position, (target.get_position() - tank.position).normalized() * 3, rocket_radius, tank.allignment, ((tank.allignment == RED) ? &rocket_red : &rocket_blue)));
+                if (target.allignment != tank.allignment) {
+
+                    rockets.push_back(Rocket(tank.position, (target.get_position() - tank.position).normalized() * 3, rocket_radius, tank.allignment, ((tank.allignment == RED) ? &rocket_red : &rocket_blue)));
+                }
 
                 tank.reload_rocket();
             }

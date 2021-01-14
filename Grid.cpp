@@ -51,6 +51,7 @@ void Grid::CheckTanksTiles()
 				if (index > 0)
 					index--;
 
+				tiles[i]->GetTanks()[z].setCurrentTileIndex(index);
 				Tank t = tiles[i]->GetTanks()[z];
 
 				tiles[index]->AddToTanks(t);
@@ -58,4 +59,33 @@ void Grid::CheckTanksTiles()
 			}
 		}
 	}
+}
+
+vector<Tile*> Grid::GetSurroundedTiles(int tileIndex) {
+	vector<Tile*> surroundingTiles;
+	Tile* original = tiles.at(tileIndex);
+
+	if (original->GetPosition().y > (GRIDROW -1)) {
+		Tile* up = tiles.at(tileIndex - static_cast<__int64>(GRIDROW));
+		surroundingTiles.push_back(up);
+	}
+
+	if (original->GetPosition().x > 0) {
+		Tile* left = tiles.at(tileIndex - static_cast<__int64>(1));
+		surroundingTiles.push_back(left);
+	}
+
+	if (original->GetPosition().x < GRIDROW) {
+		Tile* right = tiles.at(tileIndex + static_cast<__int64>(1));
+		surroundingTiles.push_back(right);
+	}
+
+	if (original->GetPosition().y < ((GRIDROW * GRIDCOL) - GRIDROW) -1) {
+		Tile* down = tiles.at(tileIndex + static_cast<__int64>(GRIDROW));
+		surroundingTiles.push_back(down);
+	}
+
+	surroundingTiles.push_back(original);
+
+	return surroundingTiles;
 }

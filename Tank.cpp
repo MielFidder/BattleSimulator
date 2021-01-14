@@ -87,16 +87,15 @@ void Tank::draw(Surface* screen)
     tank_sprite->draw(screen, (int)position.x - 14, (int)position.y - 18);
 }
 
-//Niet meer nodig voor merge sort
-//int Tank::compare_health(const Tank& other) const
-//{
-//    return ((health == other.health) ? 0 : ((health > other.health) ? 1 : -1));
-//}
 
 //Add some force in a given direction
 void Tank::push(vec2 direction, float magnitude)
 {
     force += direction * magnitude;
+}
+
+void Tank::setCurrentTileIndex(int tile) {
+    currentTile = tile;
 }
 
 } // namespace Tmpl8

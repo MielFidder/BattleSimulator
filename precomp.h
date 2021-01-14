@@ -11,6 +11,10 @@
 #define SCRWIDTH 1280
 #define SCRHEIGHT 720
 
+#define GRIDROW 9
+#define GRIDCOL	7
+
+
 // #define FULLSCREEN
 // #define ADVANCEDGL	// faster if your system supports it
 

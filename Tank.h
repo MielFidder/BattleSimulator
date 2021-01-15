@@ -36,7 +36,7 @@ class Tank
     void push(vec2 direction, float magnitude);
 
     void setCurrentTileIndex(int tile) { currentTile = tile; };
-    void getCurrentTileIndex() { return currentTile; }
+    int getCurrentTileIndex() { return currentTile; }
     
 
     vec2 position;

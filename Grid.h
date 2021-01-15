@@ -10,6 +10,7 @@ public:
 
 	void CreateGrid(vec2 gsize);
 	void CheckTanksTiles();
+	vector<Tile*> GetSurroundedTiles(int tileIndex);
 	vec2 GetGsize() { return gsize; }
 	vector<Tile*> getTiles() { return tiles; }
 private:

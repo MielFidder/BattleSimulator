@@ -35,7 +35,9 @@ class Tank
 
     void push(vec2 direction, float magnitude);
 
-    Tile* currentTile;
+    void setCurrentTileIndex(int tile);
+
+    int currentTile;
 
     vec2 position;
     vec2 speed;

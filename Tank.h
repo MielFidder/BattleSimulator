@@ -35,9 +35,9 @@ class Tank
 
     void push(vec2 direction, float magnitude);
 
-    void setCurrentTileIndex(int tile);
-
-    int currentTile;
+    void setCurrentTileIndex(int tile) { currentTile = tile; };
+    void getCurrentTileIndex() { return currentTile; }
+    
 
     vec2 position;
     vec2 speed;
@@ -60,6 +60,8 @@ class Tank
     Sprite* tank_sprite;
     Sprite* smoke_sprite;
 
+    private:
+        int currentTile;
 };
 
 } // namespace Tmpl8

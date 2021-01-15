@@ -30,17 +30,18 @@ void Grid::CreateGrid(vec2 gsize)
 
 void Grid::CheckTanksTiles()
 {
-	float tsizeX = SCRWIDTH / gsize.x;
+	//get size of tile
+	float tsizeX = SCRWIDTH / gsize.x; 
 	float tsizeY = SCRHEIGHT / gsize.y;
 
 	int indexX;
 	int indexY;
 
-	for (int i = 0; i < tiles.size(); i++) {
-		for (int z = 0; z < tiles[i]->GetTanks().size(); i++) {
-			indexX = floor(tanks[i].position.x / tsizeX);
-			indexY = floor(tanks[i].position.y / tsizeY);
-			if (tiles[i]->GetPosition().x != indexX || tiles[i]->GetPosition().y != indexY) {
+	for (int i = 0; i < tiles.size(); i++) { //loop through all tiles
+		for (int z = 0; z < tiles[i]->GetTanks().size(); i++) { //loop though all tanks in tiles
+			indexX = floor(tanks[i].position.x / tsizeX); // check what tile tank is on x axis
+			indexY = floor(tanks[i].position.y / tsizeY); // check what tile tank is on y axis
+			if (tiles[i]->GetPosition().x != indexX || tiles[i]->GetPosition().y != indexY) { // if one of the conditions change
 				if (tanks[i].position.x > SCRWIDTH) 
 					indexX = gsize.x;
 				
@@ -48,13 +49,11 @@ void Grid::CheckTanksTiles()
 					indexY = gsize.y;
 
 				int index = indexX * indexY;
-				if (index > 0)
+				if (index > 0) 
 					index--;
 
-				Tank t = tiles[i]->GetTanks[z];
-
-				tiles[index]->AddToTanks(t);
-				tiles[i]->RemoveFromTanks(t);
+				tiles[index]->AddToTanks(tiles[i]->GetTanks[z]); // add tank to new tile
+				tiles[i]->RemoveFromTanks(tiles[i]->GetTanks[z]); // remove tank from old tile
 			}
 		}
 	}

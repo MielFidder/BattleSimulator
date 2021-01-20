@@ -94,8 +94,4 @@ void Tank::push(vec2 direction, float magnitude)
     force += direction * magnitude;
 }
 
-void Tank::setCurrentTileIndex(int tile) {
-    currentTile = tile;
-}
-
 } // namespace Tmpl8

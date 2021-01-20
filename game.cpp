@@ -162,7 +162,7 @@ Tank& Game::find_closest_enemy(Tank& current_tank) {
     float closest_distance = numeric_limits<float>::infinity();
     int closest_index = 0;
 
-    int tileIndex = current_tank.currentTile;
+    int tileIndex = current_tank.getCurrentTileIndex();
 
     vector<Tile*> surroundingTiles = grid->GetSurroundedTiles(tileIndex);
 

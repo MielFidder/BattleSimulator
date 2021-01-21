@@ -119,7 +119,12 @@ void Tmpl8::Game::FillGrid()
         }else
             indexY = floor(tanks[i].position.y / tsizeY);
 
-        index = ((GRIDROW * indexY) + indexX);
+        if (indexX < 1 && indexY < 1)
+            index = 0;
+        else if (indexX < 1 || indexY < 1)
+            index = (indexX + indexY) - 1;
+        else
+            index = (indexX * indexY) - 1;
 
         grid->getTiles()[index]->AddToTanks(tanks[i]);
         tanks[i].setCurrentTileIndex(index);

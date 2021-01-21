@@ -33,7 +33,8 @@ void Grid::CheckTanksTiles()
 	//get size of tile
 	float tsizeX = SCRWIDTH / gsize.x; 
 	float tsizeY = SCRHEIGHT / gsize.y;
-
+	
+	int index;
 	int indexX;
 	int indexY;
 
@@ -45,10 +46,15 @@ void Grid::CheckTanksTiles()
 				if (tanks[z].position.x > SCRWIDTH) 
 					indexX = (gsize.x -1);
 				
-				if (tanks[z].position.y > SCRHEIGHT) 
-					indexY = (gsize.y -1);
+				if (tanks[z].position.y > SCRHEIGHT)
+					indexY = (gsize.y - 1);
 
-				int index = ((GRIDROW * indexY) + indexX);
+				if (indexX < 1 && indexY < 1)
+					index = 0;
+				else if (indexX < 1 || indexY < 1)
+					index = (indexX + indexY) - 1;
+				else
+					index = (indexX * indexY) - 1;
 
 				tiles[i]->GetTanks()[z].setCurrentTileIndex(index); // set tile index in tank
 

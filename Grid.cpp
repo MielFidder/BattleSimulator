@@ -20,9 +20,9 @@ void Grid::CreateGrid(vec2 gsize)
 {
 	this->gsize = gsize;
 
-	for (int i = 0; i < gsize.x; i++) {
-		for (int y = 0; y < gsize.y; y++) {
-			Tile* t = new Tile(vec2(i, y));
+	for (int i = 0; i < gsize.y; i++) {
+		for (int y = 0; y < gsize.x; y++) {
+			Tile* t = new Tile(vec2(y, i));
 			tiles.push_back(t);
 		}
 	}
@@ -65,7 +65,7 @@ vector<Tile*> Grid::GetSurroundedTiles(int tileIndex) {
 	vector<Tile*> surroundingTiles;
 	Tile* original = tiles.at(tileIndex);
 
-	if (original->GetPosition().y > (GRIDROW -1)) {
+	if (original->GetPosition().y > 0) {
 		Tile* up = tiles.at(tileIndex - static_cast<__int64>(GRIDROW));
 		surroundingTiles.push_back(up);
 	}

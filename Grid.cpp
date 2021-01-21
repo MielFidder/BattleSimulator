@@ -38,19 +38,17 @@ void Grid::CheckTanksTiles()
 	int indexY;
 
 	for (int i = 0; i < tiles.size(); i++) { //loop through all tiles
-		for (int z = 0; z < tiles[i]->GetTanks().size(); i++) { //loop though all tanks in tiles
-			indexX = floor(tanks[i].position.x / tsizeX); // check what tile tank is on x axis
-			indexY = floor(tanks[i].position.y / tsizeY); // check what tile tank is on y axis
+		for (int z = 0; z < (int)tiles[i]->GetTanks().size(); z++) { //loop though all tanks in tiles
+			indexX = floor(tanks[z].position.x / tsizeX); // check what tile tank is on x axis
+			indexY = floor(tanks[z].position.y / tsizeY); // check what tile tank is on y axis
 			if (tiles[i]->GetPosition().x != indexX || tiles[i]->GetPosition().y != indexY) { // if one of the conditions change
-				if (tanks[i].position.x > SCRWIDTH) 
-					indexX = gsize.x;
+				if (tanks[z].position.x > SCRWIDTH) 
+					indexX = (gsize.x -1);
 				
-				if (tanks[i].position.y > SCRHEIGHT) 
-					indexY = gsize.y;
+				if (tanks[z].position.y > SCRHEIGHT) 
+					indexY = (gsize.y -1);
 
-				int index = indexX * indexY;
-				if (index > 0) 
-					index--;
+				int index = ((GRIDROW * indexY) + indexX);
 
 				tiles[i]->GetTanks()[z].setCurrentTileIndex(index); // set tile index in tank
 

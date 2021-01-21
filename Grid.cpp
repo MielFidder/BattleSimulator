@@ -49,12 +49,7 @@ void Grid::CheckTanksTiles()
 				if (tanks[z].position.y > SCRHEIGHT)
 					indexY = (gsize.y - 1);
 
-				if (indexX < 1 && indexY < 1)
-					index = 0;
-				else if (indexX < 1 || indexY < 1)
-					index = (indexX + indexY) - 1;
-				else
-					index = (indexX * indexY) - 1;
+				index = ((GRIDROW * indexY) + indexX);
 
 				tiles[i]->GetTanks()[z].setCurrentTileIndex(index); // set tile index in tank
 

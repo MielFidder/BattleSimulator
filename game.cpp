@@ -105,17 +105,17 @@ void Tmpl8::Game::FillGrid()
 
     int index = 0;
     for (int i = 0; i < (int)tanks.size(); i++) {
-        
+        tanks[i].setStartPos(tanks[i].getpos());
         int indexX;
         int indexY;
 
         if (tanks[i].position.x > SCRWIDTH) {
-            indexX = ((grid->GetGsize().x) -1);
+            indexX = (GRIDROW -1);
         }else
             indexX = floor(tanks[i].position.x / tsizeX);
 
         if (tanks[i].position.y > SCRHEIGHT) {
-            indexY = ((grid->GetGsize().y) -1);
+            indexY = (GRIDCOL -1);
         }else
             indexY = floor(tanks[i].position.y / tsizeY);
 
@@ -186,7 +186,7 @@ Tank& Game::find_closest_enemy(Tank& current_tank) {
             }
         }
     }
-    
+
     return closest_tank;
 }
 

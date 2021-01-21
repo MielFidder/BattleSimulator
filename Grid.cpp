@@ -74,7 +74,7 @@ vector<Tile*> Grid::GetSurroundedTiles(int tileIndex) {
 		surroundingTiles.push_back(left);
 	}
 
-	if (original->GetPosition().x < GRIDROW) {
+	if (original->GetPosition().x < GRIDROW -1) {
 		Tile* right = tiles.at(tileIndex + static_cast<__int64>(1));
 		surroundingTiles.push_back(right);
 	}

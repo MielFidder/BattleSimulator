@@ -64,6 +64,7 @@ void Grid::CheckTanksTiles()
 vector<Tile*> Grid::GetSurroundedTiles(int tileIndex) {
 	vector<Tile*> surroundingTiles;
 	Tile* original = tiles.at(tileIndex);
+	surroundingTiles.push_back(original);
 
 	if (original->GetPosition().y > 0) {
 		Tile* up = tiles.at(tileIndex - static_cast<__int64>(GRIDROW));
@@ -84,8 +85,6 @@ vector<Tile*> Grid::GetSurroundedTiles(int tileIndex) {
 		Tile* down = tiles.at(tileIndex + static_cast<__int64>(GRIDROW));
 		surroundingTiles.push_back(down);
 	}
-
-	surroundingTiles.push_back(original);
 
 	return surroundingTiles;
 }

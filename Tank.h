@@ -65,7 +65,6 @@ class Tank
     Sprite* tank_sprite;
     Sprite* smoke_sprite;
 
-    private:
         int currentTile;
 };
 

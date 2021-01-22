@@ -40,21 +40,21 @@ void Grid::CheckTanksTiles()
 
 	for (int i = 0; i < tiles.size(); i++) { //loop through all tiles
 
-		for (Tank tank : tiles[i]->GetTanks()) {
-			vec2 startpos = tank.getstartpos();
-			indexX = (tank.position.x / tsizeX); // check what tile tank is on x axis
-			indexY = (tank.position.y / tsizeY); // check what tile tank is on y axis
-			if (tank.position.x > SCRWIDTH)
+		for (Tank* tank : tiles[i]->GetTanks()) {
+			vec2 startpos = tank->getstartpos();
+			indexX = (tank->position.x / tsizeX); // check what tile tank is on x axis
+			indexY = (tank->position.y / tsizeY); // check what tile tank is on y axis
+			if (tank->position.x > SCRWIDTH)
 				indexX = (GRIDROW - 1);
 
-			if (tank.position.y > SCRHEIGHT)
+			if (tank->position.y > SCRHEIGHT)
 				indexY = (GRIDCOL - 1);
 
 			if (tiles[i]->GetPosition().x != indexX || tiles[i]->GetPosition().y != indexY) { // if one of the conditions change
 
 				index = ((GRIDROW * indexY) + indexX);
 
-				tank.setCurrentTileIndex(index); // set tile index in tank
+				tank->setCurrentTileIndex(index); // set tile index in tank
 
 				tiles[index]->AddToTanks(tank); // add tank to new tile
 				tiles[i]->RemoveFromTanks(tank); // remove tank from old tile

@@ -156,7 +156,7 @@ void Tmpl8::Game::FillGrid()
 Tank* Game::find_closest_enemy(Tank& current_tank) {
     
     vector<Tank*> closest_tanks;
-    Tank* closest_tank = &current_tank;
+    Tank* closest_tank = NULL;
     float closest_distance = numeric_limits<float>::infinity();
 
     int tileIndex = current_tank.getCurrentTileIndex();
@@ -236,8 +236,7 @@ void Game::update(float deltaTime)
             {
                 Tank* target = find_closest_enemy(tank);
 
-                if (target->allignment != tank.allignment) {
-
+                if (target != NULL) {
                     rockets.push_back(Rocket(tank.position, (target->get_position() - tank.position).normalized() * 3, rocket_radius, tank.allignment, ((tank.allignment == RED) ? &rocket_red : &rocket_blue)));
                     tank.reload_rocket();
                 }

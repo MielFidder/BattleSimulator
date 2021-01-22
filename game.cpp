@@ -153,10 +153,10 @@ void Tmpl8::Game::FillGrid()
 //}
 
 // Return closest enemy door Miel
-Tank& Game::find_closest_enemy(Tank& current_tank) {
+Tank* Game::find_closest_enemy(Tank& current_tank) {
     
     vector<Tank*> closest_tanks;
-    Tank closest_tank = current_tank;
+    Tank* closest_tank = &current_tank;
     float closest_distance = numeric_limits<float>::infinity();
 
     int tileIndex = current_tank.getCurrentTileIndex();
@@ -180,13 +180,15 @@ Tank& Game::find_closest_enemy(Tank& current_tank) {
             if (sqrDist < closest_distance)
             {
                 closest_distance = sqrDist;
-                closest_tank = *tank;
+                closest_tank = tank;
             }
         }
     }
 
-    if (closest_tank.get_position().x != current_tank.get_position().x && closest_tank.get_position().y != current_tank.get_position().y) {
-        current_tank.target = closest_tank.get_position();
+    if (closest_tank != NULL) {
+        if (closest_tank->get_position().x != current_tank.get_position().x && closest_tank->get_position().y != current_tank.get_position().y) {
+            current_tank.target = closest_tank->get_position();
+        }
     }
 
     return closest_tank;
@@ -232,11 +234,11 @@ void Game::update(float deltaTime)
             //Shoot at closest target if reloaded
             if (tank.rocket_reloaded())
             {
-                Tank& target = find_closest_enemy(tank);
+                Tank* target = find_closest_enemy(tank);
 
-                if (target.allignment != tank.allignment) {
+                if (target->allignment != tank.allignment) {
 
-                    rockets.push_back(Rocket(tank.position, (target.get_position() - tank.position).normalized() * 3, rocket_radius, tank.allignment, ((tank.allignment == RED) ? &rocket_red : &rocket_blue)));
+                    rockets.push_back(Rocket(tank.position, (target->get_position() - tank.position).normalized() * 3, rocket_radius, tank.allignment, ((tank.allignment == RED) ? &rocket_red : &rocket_blue)));
                     tank.reload_rocket();
                 }
             }

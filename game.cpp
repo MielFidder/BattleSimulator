@@ -17,7 +17,7 @@
 #define MAX_FRAMES 2000
 
 //Global performance timer
-#define REF_PERFORMANCE 63648 //UPDATE THIS WITH YOUR REFERENCE PERFORMANCE (see console after 2k frames)
+#define REF_PERFORMANCE 91469 //UPDATE THIS WITH YOUR REFERENCE PERFORMANCE (see console after 2k frames)
 static timer perf_timer;
 static float duration;
 
@@ -435,6 +435,8 @@ void Tmpl8::Game::merge_sort_tanks_health(std::vector<Tank*>& sorted_tanks, int 
     }
 
     std::vector<Tank*> left, right;
+    left.reserve(end);
+    right.reserve(end);
 
     int middle = (int)sorted_tanks.size() / 2;
     for (int i = 0; i < middle; i++) {

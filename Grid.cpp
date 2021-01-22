@@ -71,6 +71,15 @@ vector<Tile*> Grid::GetSurroundedTiles(int tileIndex) {
 	if (original->GetPosition().y > 0) {
 		Tile* up = tiles.at(tileIndex - static_cast<__int64>(GRIDROW));
 		surroundingTiles.push_back(up);
+
+		if (original->GetPosition().x > 0) {
+			Tile* upleft = tiles.at((tileIndex - static_cast<__int64>(GRIDROW)) - 1);
+			surroundingTiles.push_back(upleft);
+		}
+		if (original->GetPosition().x < gsize.x - 1) {
+			Tile* upright = tiles.at((tileIndex - static_cast<__int64>(GRIDROW)) + 1);
+			surroundingTiles.push_back(upright);
+		}
 	}
 
 	if (original->GetPosition().x > 0) {
@@ -86,6 +95,15 @@ vector<Tile*> Grid::GetSurroundedTiles(int tileIndex) {
 	if (original->GetPosition().y < (GRIDCOL -1)) {
 		Tile* down = tiles.at(tileIndex + static_cast<__int64>(GRIDROW));
 		surroundingTiles.push_back(down);
+
+		if (original->GetPosition().x > 0) {
+			Tile* downleft = tiles.at((tileIndex + static_cast<__int64>(GRIDROW)) - 1);
+			surroundingTiles.push_back(downleft);
+		}
+		if (original->GetPosition().x < gsize.x - 1) {
+			Tile* downright = tiles.at((tileIndex + static_cast<__int64>(GRIDROW)) + 1);
+			surroundingTiles.push_back(downright);
+		}
 	}
 
 	return surroundingTiles;

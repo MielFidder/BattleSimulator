@@ -1,22 +1,24 @@
 #pragma once
+#include "precomp.h"
+
 class Node
 {
 public:
 	int k = 2; // dimentions in tree
 	Node* left, * right;
-	int point[];
+	Tank* tank;
 
 	Node();
-	Node(int pos[]);
+	Node(Tank* t);
 	~Node();
 
-	Node* NewNode(int arr[]);
+	Node* NewNode(Tank* t);
 
-	Node* insertRec(Node* root, int point[], unsigned int depth);
-	Node* insert(int point[]);
-	bool searchRec(Node* root, int point[], unsigned int depth);
-	bool search(int point[]);
-	bool arePointsSame(int point1[], int point2[]);
+	Node* insertRec(Node* root, Tank* t, unsigned int depth);
+	Node* insert(Tank* t);
+	bool searchRec(Node* root, Tank* t, unsigned int depth);
+	bool search(Tank* t);
+	bool arePointsSame(Tank* t1, Tank* t2);
 private:
 };
 

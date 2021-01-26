@@ -27,13 +27,12 @@ void Tile::AddToTanks(Tank* t)
 void Tile::RemoveFromTanks(Tank* t)
 { 
 	int desIndex = 0;
-
 	for (int i = 0; i < (int)tanks.size(); i++) {
-		if (&t == &tanks[i]) {
+		if (t == tanks[i]) {
 			desIndex = i;
 			break;
 		}
-		
 	}
+
 	tanks.erase(tanks.begin() + desIndex);
 }

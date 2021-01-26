@@ -41,7 +41,6 @@ void Grid::CheckTanksTiles()
 	for (int i = 0; i < tiles.size(); i++) { //loop through all tiles
 
 		for (Tank* tank : tiles[i]->GetTanks()) {
-			vec2 startpos = tank->getstartpos();
 			indexX = (tank->position.x / tsizeX); // check what tile tank is on x axis
 			indexY = (tank->position.y / tsizeY); // check what tile tank is on y axis
 			if (tank->position.x > SCRWIDTH)

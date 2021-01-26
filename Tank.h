@@ -35,6 +35,8 @@ class Tank
 
     void push(vec2 direction, float magnitude);
 
+    void setIndex(int index) { tankIndex = index; };
+
     void setCurrentTileIndex(int tile) { currentTile = tile; };
     int getCurrentTileIndex() { return currentTile; }
     void setStartPos(vec2 start) { backupStartpos = start; };
@@ -49,7 +51,7 @@ class Tank
     vec2 backupStartpos;
 
     int health;
-
+    int tankIndex;
     float collision_radius;
     vec2 force;
 

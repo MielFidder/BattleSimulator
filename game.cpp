@@ -17,7 +17,7 @@
 #define MAX_FRAMES 2000
 
 //Global performance timer
-#define REF_PERFORMANCE 63648 //UPDATE THIS WITH YOUR REFERENCE PERFORMANCE (see console after 2k frames)
+#define REF_PERFORMANCE 91469 //UPDATE THIS WITH YOUR REFERENCE PERFORMANCE (see console after 2k frames)
 static timer perf_timer;
 static float duration;
 
@@ -79,7 +79,7 @@ void Game::init()
     //Spawn red tanks
     for (int i = 0; i < NUM_TANKS_RED; i++)
     {
-        tanks.push_back(Tank(start_red_x + ((i % max_rows) * spacing), start_red_y + ((i / max_rows) * spacing), RED, &tank_red, &smoke, 80, 80, tank_radius, TANK_MAX_HEALTH, TANK_MAX_SPEED));
+        tanks.push_back(Tank(start_red_x + ((i % max_rows) * spacing), start_red_y + ((i / max_rows) * spacing), RED, &tank_red, &smoke, 80, 600, tank_radius, TANK_MAX_HEALTH, TANK_MAX_SPEED));
     }
 
     particle_beams.push_back(Particle_beam(vec2(SCRWIDTH / 2, SCRHEIGHT / 2), vec2(100, 50), &particle_beam_sprite, PARTICLE_BEAM_HIT_VALUE));
@@ -105,25 +105,23 @@ void Tmpl8::Game::FillGrid()
 
     int index = 0;
     for (int i = 0; i < (int)tanks.size(); i++) {
-        
+        tanks[i].setStartPos(tanks[i].getpos());
         int indexX;
         int indexY;
 
         if (tanks[i].position.x > SCRWIDTH) {
-            indexX = grid->GetGsize().x;
+            indexX = (GRIDROW -1);
         }else
             indexX = floor(tanks[i].position.x / tsizeX);
 
         if (tanks[i].position.y > SCRHEIGHT) {
-            indexY = grid->GetGsize().y;
+            indexY = (GRIDCOL -1);
         }else
             indexY = floor(tanks[i].position.y / tsizeY);
 
-        index = (indexX * indexY);
-        if (index > 0)
-            index--;
+        index = ((GRIDROW * indexY) + indexX);
 
-        grid->getTiles()[index]->AddToTanks(tanks[i]);
+        grid->getTiles()[index]->AddToTanks(&tanks[i]);
         tanks[i].setCurrentTileIndex(index);
     }
     cout << "done" << endl;
@@ -155,49 +153,44 @@ void Tmpl8::Game::FillGrid()
 //}
 
 // Return closest enemy door Miel
-Tank& Game::find_closest_enemy(Tank& current_tank) {
+Tank* Game::find_closest_enemy(Tank& current_tank) {
     
-    vector<Tank> closest_tanks;
-    Tank closest_tank = current_tank;
+    vector<Tank*> closest_tanks;
+    Tank* closest_tank = NULL;
     float closest_distance = numeric_limits<float>::infinity();
-    int closest_index = 0;
 
     int tileIndex = current_tank.getCurrentTileIndex();
 
     vector<Tile*> surroundingTiles = grid->GetSurroundedTiles(tileIndex);
 
-    for (int i = 0; i < (int)surroundingTiles.size(); i++) {
-        vector<Tank> tileTanks = grid->getTiles()[tileIndex]->GetTanks();
+    for (int j = 0; j < (int)surroundingTiles.size(); j++) { // loop though surroundingtiles
+        vector<Tank*> nextTileTank = surroundingTiles.at(j)->GetTanks(); // get all tanks from surrounding tile(s)
 
-        for (int i = 0; i < (int)tileTanks.size(); i++)
-        {
-            if (tanks.at(i).allignment != current_tank.allignment && tanks.at(i).active)
-            {
-                float sqrDist = fabsf((tanks.at(i).get_position() - current_tank.get_position()).sqr_length());
-                if (sqrDist < closest_distance)
-                {
-                    closest_distance = sqrDist;
-                    closest_index = i;
-                    closest_tanks.push_back(tileTanks[i]);
-                }
+        for (Tank* tank : nextTileTank) {
+            if (tank->allignment != current_tank.allignment && tank->active) {
+                closest_tanks.push_back(tank); // push tank from tile into closest_tanks
             }
         }
     }
 
-    for (int i = 0; i < (int)closest_tanks.size(); i++)
-    {
-        if (tanks.at(i).allignment != current_tank.allignment && tanks.at(i).active)
-        {
-            float sqrDist = fabsf((tanks.at(i).get_position() - current_tank.get_position()).sqr_length());
+    if (closest_tanks.size() > 0) { // if closests tanks size > 0
+
+        for (Tank* tank : closest_tanks) {
+            float sqrDist = fabsf((tank->get_position() - current_tank.get_position()).sqr_length());
             if (sqrDist < closest_distance)
             {
                 closest_distance = sqrDist;
-                closest_index = i;
-                closest_tank = closest_tanks[i];
+                closest_tank = tank;
             }
         }
     }
-    
+
+    if (closest_tank != NULL) {
+        if (closest_tank->get_position().x != current_tank.get_position().x && closest_tank->get_position().y != current_tank.get_position().y) {
+            current_tank.target = closest_tank->get_position();
+        }
+    }
+
     return closest_tank;
 }
 
@@ -241,14 +234,12 @@ void Game::update(float deltaTime)
             //Shoot at closest target if reloaded
             if (tank.rocket_reloaded())
             {
-                Tank& target = find_closest_enemy(tank);
+                Tank* target = find_closest_enemy(tank);
 
-                if (target.allignment != tank.allignment) {
-
-                    rockets.push_back(Rocket(tank.position, (target.get_position() - tank.position).normalized() * 3, rocket_radius, tank.allignment, ((tank.allignment == RED) ? &rocket_red : &rocket_blue)));
+                if (target != NULL) {
+                    rockets.push_back(Rocket(tank.position, (target->get_position() - tank.position).normalized() * 3, rocket_radius, tank.allignment, ((tank.allignment == RED) ? &rocket_red : &rocket_blue)));
+                    tank.reload_rocket();
                 }
-
-                tank.reload_rocket();
             }
         }
     }
@@ -388,8 +379,6 @@ void Game::draw()
             sorted_tanks.push_back(&tanks[i]);
         }
         merge_sort_tanks_health(sorted_tanks, begin, begin + NUM_TANKS);
-        //std::vector<const Tank*> sorted_tanks;
-        //insertion_sort_tanks_health(tanks, sorted_tanks, begin, begin + NUM_TANKS);
 
         for (int i = 0; i < NUM_TANKS; i++)
         {
@@ -403,38 +392,6 @@ void Game::draw()
         }
     }
 }
-
-// -----------------------------------------------------------
-// Sort tanks by health value using insertion sort
-// -----------------------------------------------------------
-//void Tmpl8::Game::insertion_sort_tanks_health(const std::vector<Tank>& original, std::vector<const Tank*>& sorted_tanks, int begin, int end)
-//{
-//    const int NUM_TANKS = end - begin;
-//    sorted_tanks.reserve(NUM_TANKS);
-//    sorted_tanks.emplace_back(&original.at(begin));
-//
-//    for (int i = begin + 1; i < (begin + NUM_TANKS); i++)
-//    {
-//        const Tank& current_tank = original.at(i);
-//
-//        for (int s = (int)sorted_tanks.size() - 1; s >= 0; s--)
-//        {
-//            const Tank* current_checking_tank = sorted_tanks.at(s);
-//
-//            if ((current_checking_tank->compare_health(current_tank) <= 0))
-//            {
-//                sorted_tanks.insert(1 + sorted_tanks.begin() + s, &current_tank);
-//                break;
-//            }
-//
-//            if (s == 0)
-//            {
-//                sorted_tanks.insert(sorted_tanks.begin(), &current_tank);
-//                break;
-//            }
-//        }
-//    }
-//}
 
 
 // Merge
@@ -478,6 +435,8 @@ void Tmpl8::Game::merge_sort_tanks_health(std::vector<Tank*>& sorted_tanks, int 
     }
 
     std::vector<Tank*> left, right;
+    left.reserve(end);
+    right.reserve(end);
 
     int middle = (int)sorted_tanks.size() / 2;
     for (int i = 0; i < middle; i++) {

@@ -37,11 +37,16 @@ class Tank
 
     void setCurrentTileIndex(int tile) { currentTile = tile; };
     int getCurrentTileIndex() { return currentTile; }
+    void setStartPos(vec2 start) { backupStartpos = start; };
+    vec2 getpos() { return position; };
+    vec2 getstartpos() { return backupStartpos; };
     
 
     vec2 position;
     vec2 speed;
     vec2 target;
+
+    vec2 backupStartpos;
 
     int health;
 
@@ -60,7 +65,6 @@ class Tank
     Sprite* tank_sprite;
     Sprite* smoke_sprite;
 
-    private:
         int currentTile;
 };
 

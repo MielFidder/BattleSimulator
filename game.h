@@ -23,7 +23,7 @@ class Game
     void measure_performance();
 
 
-    Tank& find_closest_enemy(Tank& current_tank);
+    Tank* find_closest_enemy(Tank& current_tank);
 
     void FillGrid();
 

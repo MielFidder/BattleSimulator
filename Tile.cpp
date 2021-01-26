@@ -14,21 +14,17 @@ Tile::~Tile()
 {
 }
 
-vector<Tank> Tile::GetTanks()
+vector<Tank*> Tile::GetTanks()
 {
 	return tanks;
 }
 
-void Tile::AddToTanks(Tank t)
+void Tile::AddToTanks(Tank* t)
 {
 	tanks.push_back(t);
-	if(position.x == 0 || position.y == 0) 
-		t.setCurrentTileIndex(position.x + position.y);
-	else
-		t.setCurrentTileIndex(position.x * position.y);
 }
 
-void Tile::RemoveFromTanks(Tank t)
+void Tile::RemoveFromTanks(Tank* t)
 { 
 	int desIndex = 0;
 

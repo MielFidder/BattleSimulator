@@ -8,7 +8,8 @@ namespace Tmpl8
 enum allignments
 {
     BLUE,
-    RED
+    RED,
+    DUMMY
 };
 
 class Tank

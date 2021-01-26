@@ -52,11 +52,6 @@ const static float rocket_radius = 10.f;
 // -----------------------------------------------------------
 void Game::init()
 {
-    //kdtree = new Node();
-    //int points[][2] = { {3,6}, {10,1} };
-    //kdtree->insert(points[0]);
-    //int pointtofind[] = {3,6};
-
     frame_count_font = new Font("assets/digital_small.png", "ABCDEFGHIJKLMNOPQRSTUVWXYZ:?!=-0123456789.");
 
     tanks.reserve(NUM_TANKS_BLUE + NUM_TANKS_RED);
@@ -89,6 +84,7 @@ void Game::init()
 
     grid = new Grid(vec2(GRIDROW, GRIDCOL), tanks);
     FillGrid();
+    fillKDTree();
 }
 
 // -----------------------------------------------------------
@@ -98,6 +94,16 @@ void Game::shutdown()
 {
 }
 
+void Game::fillKDTree() {
+    if (kdtree != NULL)
+        kdtree = NULL;
+
+    Tank* dummytank = new Tank(SCRWIDTH/2, SCRHEIGHT/2, DUMMY, &tank_red, &smoke, 80, 600, tank_radius, TANK_MAX_HEALTH, TANK_MAX_SPEED);
+    kdtree = new Node(dummytank);
+    for (int i = 1; i < tanks.size(); i++) {
+        kdtree->insert(&tanks[i]);
+    }
+}
 
 void Tmpl8::Game::FillGrid()
 {
@@ -138,7 +144,8 @@ void Tmpl8::Game::FillGrid()
 // -----------------------------------------------------------
 Tank& Game::find_closest_enemy(Tank& current_tank)
 {
-    float closest_distance = numeric_limits<float>::infinity();
+
+    /*float closest_distance = numeric_limits<float>::infinity();
     int closest_index = 0;
 
     for (int i = 0; i < tanks.size(); i++)
@@ -153,8 +160,8 @@ Tank& Game::find_closest_enemy(Tank& current_tank)
             }
         }
     }
-
-    return tanks.at(closest_index);
+    */
+    return tanks.at(0);
 }
 
 // Return closest enemy door Miel
@@ -210,6 +217,8 @@ Tank& Game::find_closest_enemy(Tank& current_tank)
 
 void Game::update(float deltaTime)
 {
+    //update KDTree
+    fillKDTree();
     //update grid
     grid->CheckTanksTiles();
 

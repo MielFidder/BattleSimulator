@@ -65,6 +65,8 @@ class Game
     long long frame_count = 0;
 
     bool lock_update = false;
+
+    void fillKDTree();
 };
 
 }; // namespace Tmpl8

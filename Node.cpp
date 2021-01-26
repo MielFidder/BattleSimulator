@@ -22,15 +22,15 @@ Node::~Node()
 struct Node* Node::NewNode(Tank* t) {
 	Node* temp = new Node;
 
-	for (int i = 0; i < k; i++) {
+	//for (int i = 0; i < k; i++) {
 		temp->tank = t;
-	}
+	//}
 
 	temp->left = temp->right = NULL;
 	return temp;
 }
 
-Node* Node::insertRec(Node* root, Tank* t, unsigned int depth) {
+Node* Node::insertRec(Tank* t, unsigned int depth) {
 	if (this == NULL) {
 		return NewNode(t);
 	}
@@ -40,17 +40,21 @@ Node* Node::insertRec(Node* root, Tank* t, unsigned int depth) {
 
 	//decide left or right
 	if (t->get_position()[cd] < (this->tank->get_position()[cd])) {
-		this->left = insertRec(root->left, t, depth + 1);
+		if (!this->left)
+			return this->left = NewNode(t);
+		this->left->insertRec(t, depth + 1);
 	}
 	else {
-		this->right = insertRec(root->right, t, depth + 1);
+		if (!this->right)
+			return this->right = NewNode(t);
+		this->right->insertRec(t, depth + 1);
 	}
 	return this;
 }
 
 //insert new point at point in tree
 Node* Node::insert(Tank* t) {
-	return insertRec(this, t, 0);
+	return insertRec(t, 0);
 }
 
 bool Node::searchRec(Node* root, Tank* t, unsigned int depth)
@@ -85,4 +89,24 @@ bool Node::arePointsSame(Tank* t1, Tank* t2) {
 			return false;
 	}
 	return true;
+}
+
+Tank& Node::closestTarget(Tank* t, unsigned int depth)
+{
+	Tank* closestTank = NULL;
+	float minDist = INFINITY;
+
+	//calculate curr dimention of comparison
+	unsigned cd = depth % k;
+
+	float tposxy;
+	float nposxy;
+	if (cd == 0) {
+		tposxy = tank->getpos().x;
+		nposxy = this->right->tank->getpos().x;
+	}
+	else {
+		tposxy = tank->getpos().y;
+	}
+	if(tposxy)
 }

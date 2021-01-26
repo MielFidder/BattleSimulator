@@ -5,84 +5,83 @@ Node::Node()
 {
 	left = NULL;
 	right = NULL;
-	point[k];
 }
 
-Node::Node(int pos[]) {
+Node::Node(Tank* t) {
 	left = NULL;
 	right = NULL;
-	point[k];
+	tank = t;
 
-	insert(pos);
+	insert(t);
 }
 
 Node::~Node()
 {
 }
 
-struct Node* Node::NewNode(int arr[]) {
+struct Node* Node::NewNode(Tank* t) {
 	Node* temp = new Node;
 
 	for (int i = 0; i < k; i++) {
-		temp->point[i] = arr[i];
+		temp->tank = t;
 	}
 
 	temp->left = temp->right = NULL;
 	return temp;
 }
 
-Node* Node::insertRec(Node* root, int point[], unsigned int depth) {
+Node* Node::insertRec(Node* root, Tank* t, unsigned int depth) {
 	if (this == NULL) {
-		return NewNode(point);
+		return NewNode(t);
 	}
 
 	//calculate curr dimention of comparison
 	unsigned cd = depth % k;
 
 	//decide left or right
-	if (point[cd] < (this->point[cd])) {
-		this->left = insertRec(root->left, point, depth + 1);
+	if (t->get_position()[cd] < (this->tank->get_position()[cd])) {
+		this->left = insertRec(root->left, t, depth + 1);
 	}
 	else {
-		this->right = insertRec(root->right, point, depth + 1);
+		this->right = insertRec(root->right, t, depth + 1);
 	}
 	return this;
 }
 
 //insert new point at point in tree
-Node* Node::insert(int point[]) {
-	return insertRec(this, point, 0);
+Node* Node::insert(Tank* t) {
+	return insertRec(this, t, 0);
 }
 
-bool Node::searchRec(Node* root, int point[], unsigned int depth)
+bool Node::searchRec(Node* root, Tank* t, unsigned int depth)
 {
 	// Base cases 
 	if (this == NULL)
 		return false;
-	if (arePointsSame(this->point, point))
+	if (arePointsSame(this->tank, t))
 		return true;
 
 	unsigned cd = depth % k;
 
 	// Compare point with this 
-	if (point[cd] < this->point[cd]) {
-		return searchRec(root->left, point, depth + 1);
+	if (t->get_position()[cd] < (this->tank->get_position()[cd])) {
+		return searchRec(root->left, t, depth + 1);
 	}
 
-	return searchRec(root->right, point, depth + 1);
+	return searchRec(root->right, t, depth + 1);
 }
 
 // Searches a Point in the K D tree. It mainly uses 
 // searchRec() 
-bool Node::search(int point[])
+bool Node::search(Tank* t)
 {
 	// Pass current depth as 0 
-	return searchRec(this, point, 0);
+	return searchRec(this, t, 0);
 }
 
-bool Node::arePointsSame(int point1[], int point2[]) {
+bool Node::arePointsSame(Tank* t1, Tank* t2) {
 	for (int i = 0; i < k; ++i) {
-		if (point1[i] != point2[i])
+		if (&t1 != &t2)
 			return false;
 	}
 	return true;

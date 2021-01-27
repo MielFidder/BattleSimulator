@@ -17,7 +17,7 @@
 #define MAX_FRAMES 2000
 
 //Global performance timer
-#define REF_PERFORMANCE 91469 //UPDATE THIS WITH YOUR REFERENCE PERFORMANCE (see console after 2k frames)
+#define REF_PERFORMANCE 63648 //UPDATE THIS WITH YOUR REFERENCE PERFORMANCE (see console after 2k frames)
 static timer perf_timer;
 static float duration;
 
@@ -80,7 +80,7 @@ void Game::init()
     //Spawn red tanks
     for (int i = 0; i < NUM_TANKS_RED; i++)
     {
-        tanks.push_back(Tank(start_red_x + ((i % max_rows) * spacing), start_red_y + ((i / max_rows) * spacing), RED, &tank_red, &smoke, 80, 600, tank_radius, TANK_MAX_HEALTH, TANK_MAX_SPEED));
+        tanks.push_back(Tank(start_red_x + ((i % max_rows) * spacing), start_red_y + ((i / max_rows) * spacing), RED, &tank_red, &smoke, 80, 80, tank_radius, TANK_MAX_HEALTH, TANK_MAX_SPEED));
     }
 
     particle_beams.push_back(Particle_beam(vec2(SCRWIDTH / 2, SCRHEIGHT / 2), vec2(100, 50), &particle_beam_sprite, PARTICLE_BEAM_HIT_VALUE));
@@ -206,8 +206,6 @@ Tank& Game::find_closest_enemy(Tank& current_tank)
 // Collision detection
 // Targeting etc..
 // -----------------------------------------------------------
-
-
 void Game::update(float deltaTime)
 {
     //update grid
@@ -216,7 +214,6 @@ void Game::update(float deltaTime)
     //Update tanks
     for (Tank& tank : tanks)
     {
-
         if (tank.active)
         {
             int tileindex = tank.getCurrentTileIndex();
@@ -224,7 +221,7 @@ void Game::update(float deltaTime)
             vector<Tile*> surroundingTiles = grid->GetSurroundedTiles(tileindex);
 
             for (int i = 0; i < (int)surroundingTiles.size(); i++) {
-                vector<Tank*> thisTileTanks = grid->getTiles()[tileindex]->GetTanks();
+                vector<Tank*> thisTileTanks = surroundingTiles[i]->GetTanks();
 
                 //voor elke tank in de tile zie hieronder
 
@@ -287,31 +284,6 @@ void Game::update(float deltaTime)
             }
         }
     }
-
-
-    //Update rockets door Miel
-    /*for (Rocket& rocket : rockets)
-    {
-        rocket.tick();
-
-        vector<Tank*> tile_tanks = rocket.get_currentTile()->GetTanks();
-
-        for (Tank* tank : tile_tanks) {
-            if (tank->active) {
-                if (tank->allignment != rocket.allignment) {
-                    explosions.push_back(Explosion(&explosion, tank->position));
-
-                    if (tank->hit(ROCKET_HIT_VALUE))
-                    {
-                        smokes.push_back(Smoke(smoke, tank->position - vec2(0, 48)));
-                    }
-
-                    rocket.active = false;
-                    break;
-                }
-            }
-        }
-    }*/
 
     //Remove exploded rockets with remove erase idiom
     rockets.erase(std::remove_if(rockets.begin(), rockets.end(), [](const Rocket& rocket) { return !rocket.active; }), rockets.end());

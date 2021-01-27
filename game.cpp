@@ -114,7 +114,6 @@ void Tmpl8::Game::FillGrid()
 
     int index = 0;
     for (int i = 0; i < (int)tanks.size(); i++) {
-        tanks[i].setStartPos(tanks[i].getpos());
         int indexX;
         int indexY;
 
@@ -144,24 +143,23 @@ void Tmpl8::Game::FillGrid()
 // -----------------------------------------------------------
 Tank& Game::find_closest_enemy(Tank& current_tank)
 {
-
-    /*float closest_distance = numeric_limits<float>::infinity();
+    float closest_distance = numeric_limits<float>::infinity();
     int closest_index = 0;
 
     for (int i = 0; i < tanks.size(); i++)
     {
         if (tanks.at(i).allignment != current_tank.allignment && tanks.at(i).active)
         {
-            float sqrDist = fabsf((tanks.at(i).get_position() - current_tank.get_position()).sqr_length());
-            if (sqrDist < closest_distance)
+            float sqr_dist = fabsf((tanks.at(i).get_position() - current_tank.get_position()).sqr_length());
+            if (sqr_dist < closest_distance)
             {
-                closest_distance = sqrDist;
+                closest_distance = sqr_dist;
                 closest_index = i;
             }
         }
     }
-    */
-    return tanks.at(0);
+
+    return tanks.at(closest_index);
 }
 
 // Return closest enemy door Miel
@@ -260,6 +258,7 @@ void Game::update(float deltaTime)
                 Tank& target = find_closest_enemy(tank);
 
                 rockets.push_back(Rocket(tank.position, (target.get_position() - tank.position).normalized() * 3, rocket_radius, tank.allignment, ((tank.allignment == RED) ? &rocket_red : &rocket_blue)));
+
                 tank.reload_rocket();
             }
         }
@@ -274,22 +273,30 @@ void Game::update(float deltaTime)
     //Update rockets
     for (Rocket& rocket : rockets)
     {
+        float tsizeX = SCRWIDTH / grid->GetGsize().x;
+        float tsizeY = SCRHEIGHT / grid->GetGsize().y;
+
         rocket.tick();
 
-        //Check if rocket collides with enemy tank, spawn explosion and if tank is destroyed spawn a smoke plume
-        for (Tank& tank : tanks)
-        {
-            if (tank.active && (tank.allignment != rocket.allignment) && rocket.intersects(tank.position, tank.collision_radius))
+        if (rocket.get_position().x > 0 && rocket.get_position().y > 0 && rocket.get_position().x < SCRWIDTH && rocket.get_position().y < SCRHEIGHT) {
+            int rocketTile = rocket.getTileIndex(tsizeX, tsizeY);
+            vector<Tank*> tileTanks = grid->getTiles()[rocketTile]->GetTanks();
+
+            //Check if rocket collides with enemy tank, spawn explosion and if tank is destroyed spawn a smoke plume
+            for (Tank* tank : tileTanks)
             {
-                explosions.push_back(Explosion(&explosion, tank.position));
-
-                if (tank.hit(ROCKET_HIT_VALUE))
+                if (tank->active && (tank->allignment != rocket.allignment) && rocket.intersects(tank->position, tank->collision_radius))
                 {
-                    smokes.push_back(Smoke(smoke, tank.position - vec2(0, 48)));
-                }
+                    explosions.push_back(Explosion(&explosion, tank->position));
 
-                rocket.active = false;
-                break;
+                    if (tank->hit(ROCKET_HIT_VALUE))
+                    {
+                        smokes.push_back(Smoke(smoke, tank->position - vec2(0, 48)));
+                    }
+
+                    rocket.active = false;
+                    break;
+                }
             }
         }
     }

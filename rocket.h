@@ -16,9 +16,8 @@ class Rocket
 
     vec2 get_position() const { return position; };
     float get_collision_radius() const { return collision_radius; };
-    Tile* get_currentTile() const { return currentTile; };
 
-    Tile* currentTile;
+    int getTileIndex(float tsizeX, float tsizeY);
 
     vec2 position;
     vec2 speed;
@@ -31,6 +30,8 @@ class Rocket
 
     int current_frame;
     Sprite* rocket_sprite;
+
+    int currentTile;
 };
 
 } // namespace Tmpl8

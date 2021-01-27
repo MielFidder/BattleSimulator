@@ -41,4 +41,23 @@ bool Rocket::intersects(vec2 position_other, float radius_other) const
     }
 }
 
+int Rocket::getTileIndex(float tsizeX, float tsizeY) {
+    int indexX;
+    int indexY;
+    int index;
+
+    if (this->position.x > SCRWIDTH) {
+        indexX = (GRIDROW - 1);
+    }else
+        indexX = floor(this->position.x / tsizeX);
+
+    if (this->position.y > SCRHEIGHT) {
+        indexY = (GRIDCOL - 1);
+    }else
+        indexY = floor(this->position.y / tsizeY);
+
+    index = ((GRIDROW * indexY) + indexX);
+    return index;
+}
+
 } // namespace Tmpl8

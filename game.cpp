@@ -46,6 +46,8 @@ const static vec2 rocket_size(25, 24);
 const static float tank_radius = 8.5f;
 const static float rocket_radius = 10.f;
 
+ThreadPool tp(std::thread::hardware_concurrency());
+
 
 // -----------------------------------------------------------
 // Initialize the application
@@ -84,7 +86,7 @@ void Game::init()
 
     grid = new Grid(vec2(GRIDROW, GRIDCOL), tanks);
     FillGrid();
-    fillKDTree();
+    //fillKDTree();
 }
 
 // -----------------------------------------------------------
@@ -95,8 +97,9 @@ void Game::shutdown()
 }
 
 void Game::fillKDTree() {
-    if (kdtree != NULL)
+    if (kdtree != NULL){
         kdtree = NULL;
+    }
 
     Tank* dummytank = new Tank(SCRWIDTH/2, SCRHEIGHT/2, DUMMY, &tank_red, &smoke, 80, 600, tank_radius, TANK_MAX_HEALTH, TANK_MAX_SPEED);
     kdtree = new Node(dummytank);
@@ -214,7 +217,7 @@ Tank& Game::find_closest_enemy(Tank& current_tank)
 void Game::update(float deltaTime)
 {
     //update KDTree
-    fillKDTree();
+    //fillKDTree();
     //update grid
     grid->CheckTanksTiles();
 
@@ -495,7 +498,9 @@ void Game::tick(float deltaTime)
     {
         update(deltaTime);
     }
-    draw();
+    //draw();
+    std::future<void> future = tp.enqueue([&]() { draw(); });
+    future.wait();
 
     measure_performance();
 

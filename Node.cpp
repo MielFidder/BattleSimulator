@@ -19,7 +19,7 @@ Node::~Node()
 {
 }
 
-struct Node* Node::NewNode(Tank* t) {
+Node* Node::NewNode(Tank* t) {
 	Node* temp = new Node;
 
 	//for (int i = 0; i < k; i++) {
@@ -108,5 +108,8 @@ Tank& Node::closestTarget(Tank* t, unsigned int depth)
 	else {
 		tposxy = tank->getpos().y;
 	}
-	if(tposxy)
+	if (tposxy) {
+
+	}
+	return *closestTank;
 }

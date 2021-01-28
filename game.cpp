@@ -276,29 +276,31 @@ void Game::update(float deltaTime)
     //Update rockets
     for (Rocket& rocket : rockets)
     {
-        float tsizeX = SCRWIDTH / grid->GetGsize().x;
-        float tsizeY = SCRHEIGHT / grid->GetGsize().y;
+        if (rocket.active) {
+            float tsizeX = SCRWIDTH / grid->GetGsize().x;
+            float tsizeY = SCRHEIGHT / grid->GetGsize().y;
 
-        rocket.tick();
+            rocket.tick();
 
-        if (rocket.get_position().x > 0 && rocket.get_position().y > 0 && rocket.get_position().x < SCRWIDTH && rocket.get_position().y < SCRHEIGHT) {
-            int rocketTile = rocket.getTileIndex(tsizeX, tsizeY);
-            vector<Tank*> tileTanks = grid->getTiles()[rocketTile]->GetTanks();
+            if (rocket.get_position().x > 0 && rocket.get_position().y > 0 && rocket.get_position().x < SCRWIDTH && rocket.get_position().y < SCRHEIGHT) {
+                int rocketTile = rocket.getTileIndex(tsizeX, tsizeY);
+                vector<Tank*> tileTanks = grid->getTiles()[rocketTile]->GetTanks();
 
-            //Check if rocket collides with enemy tank, spawn explosion and if tank is destroyed spawn a smoke plume
-            for (Tank* tank : tileTanks)
-            {
-                if (tank->active && (tank->allignment != rocket.allignment) && rocket.intersects(tank->position, tank->collision_radius))
+                //Check if rocket collides with enemy tank, spawn explosion and if tank is destroyed spawn a smoke plume
+                for (Tank* tank : tileTanks)
                 {
-                    explosions.push_back(Explosion(&explosion, tank->position));
-
-                    if (tank->hit(ROCKET_HIT_VALUE))
+                    if (tank->active && (tank->allignment != rocket.allignment) && rocket.intersects(tank->position, tank->collision_radius))
                     {
-                        smokes.push_back(Smoke(smoke, tank->position - vec2(0, 48)));
-                    }
+                        explosions.push_back(Explosion(&explosion, tank->position));
 
-                    rocket.active = false;
-                    break;
+                        if (tank->hit(ROCKET_HIT_VALUE))
+                        {
+                            smokes.push_back(Smoke(smoke, tank->position - vec2(0, 48)));
+                        }
+
+                        rocket.active = false;
+                        break;
+                    }
                 }
             }
         }
@@ -353,23 +355,19 @@ void Game::draw()
             background.get_buffer()[(int)tPos.x + (int)tPos.y * SCRWIDTH] = sub_blend(background.get_buffer()[(int)tPos.x + (int)tPos.y * SCRWIDTH], 0x808080);
     }
 
-    for (Rocket& rocket : rockets)
-    {
+    for (Rocket& rocket : rockets) {
         rocket.draw(screen);
     }
-
-    for (Smoke& smoke : smokes)
-    {
+    
+    for (Smoke& smoke : smokes){
         smoke.draw(screen);
     }
-
-    for (Particle_beam& particle_beam : particle_beams)
-    {
+    
+    for (Particle_beam& particle_beam : particle_beams){
         particle_beam.draw(screen);
     }
 
-    for (Explosion& explosion : explosions)
-    {
+    for (Explosion& explosion : explosions){
         explosion.draw(screen);
     }
 

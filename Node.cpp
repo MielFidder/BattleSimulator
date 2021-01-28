@@ -22,9 +22,7 @@ Node::~Node()
 Node* Node::NewNode(Tank* t) {
 	Node* temp = new Node;
 
-	//for (int i = 0; i < k; i++) {
-		temp->tank = t;
-	//}
+	temp->tank = t;
 
 	temp->left = temp->right = NULL;
 	return temp;
@@ -91,25 +89,70 @@ bool Node::arePointsSame(Tank* t1, Tank* t2) {
 	return true;
 }
 
-Tank& Node::closestTarget(Tank* t, unsigned int depth)
+Node* Node::closestTarget(Node* root, Tank* target, unsigned int depth)
 {
-	Tank* closestTank = NULL;
-	float minDist = INFINITY;
+	if (root == NULL) return NULL;
 
-	//calculate curr dimention of comparison
-	unsigned cd = depth % k;
+	Node* nextBranch = NULL;
+	Node* otherBranch = NULL;
 
-	float tposxy;
-	float nposxy;
-	if (cd == 0) {
-		tposxy = tank->getpos().x;
-		nposxy = this->right->tank->getpos().x;
+	unsigned cd = depth % 2;
+
+	if (target->getpos()[cd] < root->tank->getpos()[cd]) {
+		nextBranch = root->left;
+		otherBranch = root->right;
 	}
 	else {
-		tposxy = tank->getpos().y;
+		nextBranch = root->right;
+		otherBranch = root->left;
 	}
-	if (tposxy) {
 
+	Node* temp = closestTarget(nextBranch, target, depth++);
+	Node* best = closest(temp, root, target);
+
+	long radiusSquared = distSquared(target, best->tank);
+
+	long dist = target->getpos()[cd] - root->tank->getpos()[cd];
+
+	if (radiusSquared >= dist * dist) {
+		temp = closestTarget(otherBranch, target, depth++);
+		best = closest(temp, best, target);
 	}
-	return *closestTank;
+
+	return best;
 }
+
+Node* Node::closestTarget(Tank target)
+{
+	Node* root = this;
+	return closestTarget(root, &target, 0);
+}
+
+Node* Node::closest(Node* n0, Node* n1, Tank* target)
+{
+	if (n0 == NULL)
+		return n1;
+	if (n1 == NULL)
+		return n0;
+
+	long d1 = distSquared(n0->tank, target);
+	long d2 = distSquared(n1->tank, target);
+
+	if (d1 < d2)
+		return n0;
+	else
+		n1;
+}
+
+long Node::distSquared(Tank* p0, Tank* p1)
+{
+	long total = 0;
+
+	for (int i = 0; i < 2; i++) {
+		int diff = std::abs(p0->getpos()[i] - p1->getpos()[i]);
+		total += pow(diff, 2);
+	}
+	return total;
+}
+
+

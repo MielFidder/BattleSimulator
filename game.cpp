@@ -17,7 +17,7 @@
 #define MAX_FRAMES 2000
 
 //Global performance timer
-#define REF_PERFORMANCE 63648 //UPDATE THIS WITH YOUR REFERENCE PERFORMANCE (see console after 2k frames)
+#define REF_PERFORMANCE 37403 //UPDATE THIS WITH YOUR REFERENCE PERFORMANCE (see console after 2k frames)
 static timer perf_timer;
 static float duration;
 
@@ -86,7 +86,7 @@ void Game::init()
 
     grid = new Grid(vec2(GRIDROW, GRIDCOL), tanks);
     FillGrid();
-    //fillKDTree();
+    fillKDTree();
 }
 
 // -----------------------------------------------------------
@@ -217,7 +217,7 @@ Tank& Game::find_closest_enemy(Tank& current_tank)
 void Game::update(float deltaTime)
 {
     //update KDTree
-    //fillKDTree();
+    fillKDTree();
     //update grid
     grid->CheckTanksTiles();
 
@@ -259,9 +259,9 @@ void Game::update(float deltaTime)
                 //Shoot at closest target if reloaded
                 if (tank.rocket_reloaded())
                 {
-                    Tank& target = find_closest_enemy(tank);
+                    Node* target = kdtree->closestTarget(kdtree, &tank, 0);
 
-                    rockets.push_back(Rocket(tank.position, (target.get_position() - tank.position).normalized() * 3, rocket_radius, tank.allignment, ((tank.allignment == RED) ? &rocket_red : &rocket_blue)));
+                    rockets.push_back(Rocket(tank.position, (target->tank->getpos() - tank.position).normalized() * 3, rocket_radius, tank.allignment, ((tank.allignment == RED) ? &rocket_red : &rocket_blue)));
 
                     tank.reload_rocket();
                 }

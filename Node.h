@@ -4,7 +4,7 @@
 class Node
 {
 public:
-	int k = 2; // dimentions in tree
+	const int k = 2; // dimentions in tree
 	Node* left, * right;
 	Tank* tank;
 
@@ -19,7 +19,10 @@ public:
 	bool searchRec(Node* root, Tank* t, unsigned int depth);
 	bool search(Tank* t);
 	bool arePointsSame(Tank* t1, Tank* t2);
-	Tank& closestTarget(Tank* t, unsigned int depth);
+	Node* closestTarget(Node* root, Tank* target, unsigned int depth);
+	Node* closestTarget(Tank target);
+	Node* closest(Node* n0, Node* n1, Tank* target);
+	static long distSquared(Tank* p0, Tank* p1);
 private:
 };
 

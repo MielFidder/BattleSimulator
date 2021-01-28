@@ -459,7 +459,7 @@ void Tmpl8::Game::merge_sort_tanks_health(std::vector<Tank*>& sorted_tanks, int 
         right.push_back(sorted_tanks.at(i));
     }
 
-    if (pow(2, depth) <= threadCount) {
+    if (pow(depth, 2) <= threadCount) {
         std::future<void> mergefut = tp.enqueue([&] {merge_sort_tanks_health(left, 0, (int)left.size(), (depth + 1)); });
         merge_sort_tanks_health(right, 0, (int)right.size(), (depth + 1));
 

@@ -63,7 +63,7 @@ void Grid::CheckTanksTiles()
 }
 
 vector<Tile*> Grid::GetSurroundedTiles(int tileIndex) {
-	vector<Tile*> surroundingTiles;
+	std::vector<Tile*> surroundingTiles;
 	Tile* original = tiles.at(tileIndex);
 	surroundingTiles.push_back(original);
 

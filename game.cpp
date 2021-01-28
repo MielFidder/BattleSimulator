@@ -222,50 +222,52 @@ void Game::update(float deltaTime)
     grid->CheckTanksTiles();
 
     //Update tanks
-    for (Tank& tank : tanks)
-    {
-        if (tank.active)
+    std::future<void> futuretank = tp.enqueue([&]() {
+        for (Tank& tank : tanks)
         {
-            int tileindex = tank.getCurrentTileIndex();
+            if (tank.active)
+            {
+                int tileindex = tank.getCurrentTileIndex();
 
-            vector<Tile*> surroundingTiles = grid->GetSurroundedTiles(tileindex);
+                vector<Tile*> surroundingTiles = grid->GetSurroundedTiles(tileindex);
 
-            for (int i = 0; i < (int)surroundingTiles.size(); i++) {
-                vector<Tank*> thisTileTanks = surroundingTiles[i]->GetTanks();
+                for (int i = 0; i < (int)surroundingTiles.size(); i++) {
+                    vector<Tank*> thisTileTanks = surroundingTiles[i]->GetTanks();
 
-                //voor elke tank in de tile zie hieronder
+                    //voor elke tank in de tile zie hieronder
 
-                for (Tank* oTank : thisTileTanks)
-                {
-                    if (&tank == oTank) continue;
-
-                    vec2 dir = tank.get_position() - oTank->get_position();
-                    float dirSquaredLen = dir.sqr_length();
-
-                    float colSquaredLen = (tank.get_collision_radius() + oTank->get_collision_radius());
-                    colSquaredLen *= colSquaredLen;
-
-                    if (dirSquaredLen < colSquaredLen)
+                    for (Tank* oTank : thisTileTanks)
                     {
-                        tank.push(dir.normalized(), 0.3f);
+                        if (&tank == oTank) continue;
+
+                        vec2 dir = tank.get_position() - oTank->get_position();
+                        float dirSquaredLen = dir.sqr_length();
+
+                        float colSquaredLen = (tank.get_collision_radius() + oTank->get_collision_radius());
+                        colSquaredLen *= colSquaredLen;
+
+                        if (dirSquaredLen < colSquaredLen)
+                        {
+                            tank.push(dir.normalized(), 0.3f);
+                        }
                     }
                 }
-            }
 
-            //Move tanks according to speed and nudges (see above) also reload
-            tank.tick();
+                //Move tanks according to speed and nudges (see above) also reload
+                tank.tick();
 
-            //Shoot at closest target if reloaded
-            if (tank.rocket_reloaded())
-            {
-                Tank& target = find_closest_enemy(tank);
+                //Shoot at closest target if reloaded
+                if (tank.rocket_reloaded())
+                {
+                    Tank& target = find_closest_enemy(tank);
 
-                rockets.push_back(Rocket(tank.position, (target.get_position() - tank.position).normalized() * 3, rocket_radius, tank.allignment, ((tank.allignment == RED) ? &rocket_red : &rocket_blue)));
+                    rockets.push_back(Rocket(tank.position, (target.get_position() - tank.position).normalized() * 3, rocket_radius, tank.allignment, ((tank.allignment == RED) ? &rocket_red : &rocket_blue)));
 
-                tank.reload_rocket();
+                    tank.reload_rocket();
+                }
             }
         }
-    }
+    });
 
     //Update smoke plumes
     for (Smoke& smoke : smokes)
@@ -310,28 +312,37 @@ void Game::update(float deltaTime)
     rockets.erase(std::remove_if(rockets.begin(), rockets.end(), [](const Rocket& rocket) { return !rocket.active; }), rockets.end());
 
     //Update particle beams
-    for (Particle_beam& particle_beam : particle_beams)
-    {
-        particle_beam.tick(tanks);
-
-        //Damage all tanks within the damage window of the beam (the window is an axis-aligned bounding box)
-        for (Tank& tank : tanks)
+    std::future<void> futureParti = tp.enqueue([&]() {
+        for (Particle_beam& particle_beam : particle_beams)
         {
-            if (tank.active && particle_beam.rectangle.intersects_circle(tank.get_position(), tank.get_collision_radius()))
+
+            particle_beam.tick(tanks);
+
+            //Damage all tanks within the damage window of the beam (the window is an axis-aligned bounding box)
+            for (Tank& tank : tanks)
             {
-                if (tank.hit(particle_beam.damage))
+                if (tank.active && particle_beam.rectangle.intersects_circle(tank.get_position(), tank.get_collision_radius()))
                 {
-                    smokes.push_back(Smoke(smoke, tank.position - vec2(0, 48)));
+                    if (tank.hit(particle_beam.damage))
+                    {
+                        smokes.push_back(Smoke(smoke, tank.position - vec2(0, 48)));
+                    }
                 }
             }
         }
-    }
+    });
 
     //Update explosion sprites and remove when done with remove erase idiom
-    for (Explosion& explosion : explosions)
-    {
-        explosion.tick();
-    }
+
+    std::future<void> futureexpl = tp.enqueue([&]() {    
+        for (Explosion& explosion : explosions){
+            explosion.tick();
+        } 
+    });
+
+    futuretank.wait();
+    futureParti.wait();
+    futureexpl.wait();
 
     explosions.erase(std::remove_if(explosions.begin(), explosions.end(), [](const Explosion& explosion) { return explosion.done(); }), explosions.end());
 }

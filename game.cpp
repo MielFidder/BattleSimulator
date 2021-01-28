@@ -46,8 +46,7 @@ const static vec2 rocket_size(25, 24);
 const static float tank_radius = 8.5f;
 const static float rocket_radius = 10.f;
 
-unsigned int threadCount = std::thread::hardware_concurrency();
-ThreadPool tp(threadCount);
+ThreadPool tp(THREADCOUNT);
 
 
 // -----------------------------------------------------------
@@ -114,8 +113,6 @@ void Tmpl8::Game::FillGrid()
     float tsizeX = SCRWIDTH / grid->GetGsize().x;
     float tsizeY = SCRHEIGHT / grid->GetGsize().y;
 
-    int tankIndex = 0;
-
     int index = 0;
     for (int i = 0; i < (int)tanks.size(); i++) {
         int indexX;
@@ -135,8 +132,7 @@ void Tmpl8::Game::FillGrid()
 
         grid->getTiles()[index]->AddToTanks(&tanks[i]);
         tanks[i].setCurrentTileIndex(index);
-        tanks[i].setIndex(tankIndex);
-        tankIndex++;
+        tanks[i].setIndex(i);
     }
     cout << "done" << endl;
 }
@@ -166,48 +162,6 @@ Tank& Game::find_closest_enemy(Tank& current_tank)
     return tanks.at(closest_index);
 }
 
-// Return closest enemy door Miel
-//Tank* Game::find_closest_enemy(Tank& current_tank) {
-//    
-//    vector<Tank*> closest_tanks;
-//    Tank* closest_tank = NULL;
-//    float closest_distance = numeric_limits<float>::infinity();
-//
-//    int tileIndex = current_tank.getCurrentTileIndex();
-//
-//    vector<Tile*> surroundingTiles = grid->GetSurroundedTiles(tileIndex);
-//
-//    for (int j = 0; j < (int)surroundingTiles.size(); j++) { // loop though surroundingtiles
-//        vector<Tank*> nextTileTank = surroundingTiles.at(j)->GetTanks(); // get all tanks from surrounding tile(s)
-//
-//        for (Tank* tank : nextTileTank) {
-//            if (tank->allignment != current_tank.allignment && tank->active) {
-//                closest_tanks.push_back(tank); // push tank from tile into closest_tanks
-//            }
-//        }
-//    }
-//
-//    if (closest_tanks.size() > 0) { // if closests tanks size > 0
-//
-//        for (Tank* tank : closest_tanks) {
-//            float sqrDist = fabsf((tank->get_position() - current_tank.get_position()).sqr_length());
-//            if (sqrDist < closest_distance)
-//            {
-//                closest_distance = sqrDist;
-//                closest_tank = tank;
-//            }
-//        }
-//    }
-//
-//    if (closest_tank != NULL) {
-//        if (closest_tank->get_position().x != current_tank.get_position().x && closest_tank->get_position().y != current_tank.get_position().y) {
-//            current_tank.target = closest_tank->get_position();
-//        }
-//    }
-//
-//    return closest_tank;
-//}
-
 // -----------------------------------------------------------
 // Update the game state:
 // Move all objects
@@ -227,9 +181,7 @@ void Game::update(float deltaTime)
     {
         if (tank.active)
         {
-            int tileindex = tank.getCurrentTileIndex();
-
-            vector<Tile*> surroundingTiles = grid->GetSurroundedTiles(tileindex);
+            vector<Tile*> surroundingTiles = grid->GetSurroundedTiles(tank.getCurrentTileIndex());
 
             for (int i = 0; i < (int)surroundingTiles.size(); i++) {
                 vector<Tank*> thisTileTanks = surroundingTiles[i]->GetTanks();
@@ -343,6 +295,7 @@ void Game::update(float deltaTime)
 
     explosions.erase(std::remove_if(explosions.begin(), explosions.end(), [](const Explosion& explosion) { return explosion.done(); }), explosions.end());
 }
+
 
 void Game::draw()
 {
@@ -459,7 +412,7 @@ void Tmpl8::Game::merge_sort_tanks_health(std::vector<Tank*>& sorted_tanks, int 
         right.push_back(sorted_tanks.at(i));
     }
 
-    if (pow(depth, 2) <= threadCount) {
+    if (pow(depth, 2) <= THREADCOUNT) {
         std::future<void> mergefut = tp.enqueue([&] {merge_sort_tanks_health(left, 0, (int)left.size(), (depth + 1)); });
         merge_sort_tanks_health(right, 0, (int)right.size(), (depth + 1));
 

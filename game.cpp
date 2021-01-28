@@ -46,8 +46,7 @@ const static vec2 rocket_size(25, 24);
 const static float tank_radius = 8.5f;
 const static float rocket_radius = 10.f;
 
-ThreadPool tp(std::thread::hardware_concurrency());
-
+ThreadPool tp(THREADCOUNT);
 
 // -----------------------------------------------------------
 // Initialize the application
@@ -229,10 +228,10 @@ void Game::update(float deltaTime)
             {
                 int tileindex = tank.getCurrentTileIndex();
 
-                vector<Tile*> surroundingTiles = grid->GetSurroundedTiles(tileindex);
+                std::vector<Tile*> surroundingTiles = grid->GetSurroundedTiles(tileindex);
 
                 for (int i = 0; i < (int)surroundingTiles.size(); i++) {
-                    vector<Tank*> thisTileTanks = surroundingTiles[i]->GetTanks();
+                    std::vector<Tank*> thisTileTanks = surroundingTiles[i]->GetTanks();
 
                     //voor elke tank in de tile zie hieronder
 
@@ -286,7 +285,7 @@ void Game::update(float deltaTime)
 
             if (rocket.get_position().x > 0 && rocket.get_position().y > 0 && rocket.get_position().x < SCRWIDTH && rocket.get_position().y < SCRHEIGHT) {
                 int rocketTile = rocket.getTileIndex(tsizeX, tsizeY);
-                vector<Tank*> tileTanks = grid->getTiles()[rocketTile]->GetTanks();
+                std::vector<Tank*> tileTanks = grid->getTiles()[rocketTile]->GetTanks();
 
                 //Check if rocket collides with enemy tank, spawn explosion and if tank is destroyed spawn a smoke plume
                 for (Tank* tank : tileTanks)
@@ -393,7 +392,8 @@ void Game::draw()
         for (int i = begin; i < begin + NUM_TANKS; i++) {
             sorted_tanks.push_back(&tanks[i]);
         }
-        merge_sort_tanks_health(sorted_tanks, begin, begin + NUM_TANKS);
+
+        merge_sort_tanks_health(sorted_tanks, begin, begin + NUM_TANKS, 0);
 
         for (int i = 0; i < NUM_TANKS; i++)
         {
@@ -443,7 +443,7 @@ void Tmpl8::Game::merge_tanks_health(std::vector<Tank*> v1, std::vector<Tank*> v
 }
 
 // Merge Sort
-void Tmpl8::Game::merge_sort_tanks_health(std::vector<Tank*>& sorted_tanks, int begin, int end) {
+void Tmpl8::Game::merge_sort_tanks_health(std::vector<Tank*>& sorted_tanks, int begin, int end, int depth) {
 
     if ((end - begin) <= 1) {
         return;
@@ -461,9 +461,16 @@ void Tmpl8::Game::merge_sort_tanks_health(std::vector<Tank*>& sorted_tanks, int 
         right.push_back(sorted_tanks.at(i));
     }
 
+    if (pow(2, depth) <= THREADCOUNT) {
+        std::future<void> mergefut = tp.enqueue([&] {merge_sort_tanks_health(left, 0, (int)left.size(), depth + 1); });
+        merge_sort_tanks_health(right, 0, (int)right.size(), depth + 1);
 
-    merge_sort_tanks_health(left, 0, (int)left.size());
-    merge_sort_tanks_health(right, 0, (int)right.size());
+        mergefut.wait();
+    }
+    else {
+        merge_sort_tanks_health(left, 0, (int)left.size(), depth);
+        merge_sort_tanks_health(right, 0, (int)right.size(), depth);
+    }
     merge_tanks_health(left, right, sorted_tanks, begin, end);
 }
 

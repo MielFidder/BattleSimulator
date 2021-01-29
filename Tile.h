@@ -9,8 +9,8 @@ class Tile
 		~Tile();
 
 		vector<Tank*> GetTanks();
-		void AddToTanks(Tank* t);
-		void RemoveFromTanks(Tank* t);
+		void AddTankToTile(Tank* t);
+		void RemoveTankFromTile(Tank* t);
 		vec2 GetPosition() { return position; }
 	private:
 		vector<Tank*> tanks;

@@ -86,7 +86,6 @@ void Game::init()
 
     grid = new Grid(vec2(GRIDROW, GRIDCOL), tanks);
     FillGrid();
-    //fillKDTree();
 }
 
 // -----------------------------------------------------------
@@ -130,7 +129,7 @@ void Tmpl8::Game::FillGrid()
 
         index = ((GRIDROW * indexY) + indexX);
 
-        grid->getTiles()[index]->AddToTanks(&tanks[i]);
+        grid->getTiles()[index]->AddTankToTile(&tanks[i]);
         tanks[i].setCurrentTileIndex(index);
         tanks[i].setIndex(i);
     }
@@ -171,10 +170,8 @@ Tank& Game::find_closest_enemy(Tank& current_tank)
 // -----------------------------------------------------------
 void Game::update(float deltaTime)
 {
-    //update KDTree
-    //fillKDTree();
     //update grid
-    grid->CheckTanksTiles();
+    grid->UpdateTanksInTiles();
 
     //Update tanks
     for (Tank& tank : tanks)
@@ -200,7 +197,7 @@ void Game::update(float deltaTime)
 
                     if (dirSquaredLen < colSquaredLen)
                     {
-                        tank.push(dir.normalized(), 0.3f);
+                        tank.push(dir.normalized(), 0.6f);
                     }
                 }
             }
@@ -211,10 +208,6 @@ void Game::update(float deltaTime)
             //Shoot at closest target if reloaded
             if (tank.rocket_reloaded())
             {
-                //Node* target = kdtree->closestTarget(kdtree, &tank, 0);
-
-                //rockets.push_back(Rocket(tank.position, (target->tank->getpos() - tank.position).normalized() * 3, rocket_radius, tank.allignment, ((tank.allignment == RED) ? &rocket_red : &rocket_blue)));
-
                 Tank& target = find_closest_enemy(tank);
 
                 rockets.push_back(Rocket(tank.position, (target.get_position() - tank.position).normalized() * 3, rocket_radius, tank.allignment, ((tank.allignment == RED) ? &rocket_red : &rocket_blue)));
@@ -270,23 +263,21 @@ void Game::update(float deltaTime)
     //Update particle beams
     for (Particle_beam& particle_beam : particle_beams)
     {
-        int beamTileIndex = grid->TileIndex((particle_beam.min_position + particle_beam.max_position) / 2);
-        std::vector<Tank*> tileTanks = grid->getTiles()[beamTileIndex]->GetTanks();
+        particle_beam.tick();
+        vec2 offset = (0, 100);
+        int beamTileIndex = grid->GetTileIndex(((particle_beam.min_position + particle_beam.max_position) / 2) + offset);
+        vector<Tile*> surroundingTiles = grid->GetSurroundedTiles(beamTileIndex);
+        for (int i = 0; i < (int)surroundingTiles.size(); i++) {
+            std::vector<Tank*> tileTanks = surroundingTiles[i]->GetTanks();
 
-        //Check if rocket collides with enemy tank, spawn explosion and if tank is destroyed spawn a smoke plume
-        for (Tank* tank : tileTanks)
-        {
-
-            particle_beam.tick(tanks);
-
-            //Damage all tanks within the damage window of the beam (the window is an axis-aligned bounding box)
-            for (Tank& tank : tanks)
+            //Check if rocket collides with enemy tank, spawn explosion and if tank is destroyed spawn a smoke plume
+            for (Tank* tank : tileTanks)
             {
-                if (tank.active && particle_beam.rectangle.intersects_circle(tank.get_position(), tank.get_collision_radius()))
+                if (tank->active && particle_beam.rectangle.intersects_circle(tank->get_position(), tank->get_collision_radius()))
                 {
-                    if (tank.hit(particle_beam.damage))
+                    if (tank->hit(particle_beam.damage))
                     {
-                        smokes.push_back(Smoke(smoke, tank.position - vec2(0, 48)));
+                        smokes.push_back(Smoke(smoke, tank->position - vec2(0, 48)));
                     }
                 }
             }
@@ -478,12 +469,6 @@ void Game::tick(float deltaTime)
     future.wait();
 
     measure_performance();
-
-    // print something in the graphics window
-    //screen->Print("hello world", 2, 2, 0xffffff);
-
-    // print something to the text window
-    //cout << "This goes to the console window." << std::endl;
 
     //Print frame count
     frame_count++;

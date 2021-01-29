@@ -19,12 +19,12 @@ vector<Tank*> Tile::GetTanks()
 	return tanks;
 }
 
-void Tile::AddToTanks(Tank* t)
+void Tile::AddTankToTile(Tank* t)
 {
 	tanks.push_back(t);
 }
 
-void Tile::RemoveFromTanks(Tank* t)
+void Tile::RemoveTankFromTile(Tank* t)
 { 
 	for (int i = 0; i < (int)tanks.size(); i++) {
 		if (t == tanks[i]) {

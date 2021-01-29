@@ -28,7 +28,7 @@ void Grid::CreateGrid(vec2 gsize)
 	}
 }
 
-void Grid::CheckTanksTiles()
+void Grid::UpdateTanksInTiles()
 {
 	//get size of tile
 	float tsizeX = SCRWIDTH / gsize.x; 
@@ -55,8 +55,8 @@ void Grid::CheckTanksTiles()
 
 				tank->setCurrentTileIndex(index); // set tile index in tank
 
-				tiles[index]->AddToTanks(tank); // add tank to new tile
-				tiles[i]->RemoveFromTanks(tank); // remove tank from old tile
+				tiles[index]->AddTankToTile(tank); // add tank to new tile
+				tiles[i]->RemoveTankFromTile(tank); // remove tank from old tile
 			}
 		}
 	}
@@ -108,7 +108,7 @@ vector<Tile*> Grid::GetSurroundedTiles(int tileIndex) {
 	return surroundingTiles;
 }
 
-int Grid::TileIndex(vec2 pos)
+int Grid::GetTileIndex(vec2 pos)
 {
 	int indexX;
 	int indexY;

@@ -17,8 +17,7 @@ class Game
     void update(float deltaTime);
     void draw();
     void tick(float deltaTime);
-
-    void updateTanks();
+    void fillKDTree();
 
     //void insertion_sort_tanks_health(const std::vector<Tank>& original, std::vector<const Tank*>& sorted_tanks, int begin, int end);
     void merge_sort_tanks_health(std::vector<Tank*>& sorted_tanks, int begin, int end, int depth);
@@ -70,7 +69,6 @@ class Game
 
     bool lock_update = false;
 
-    void fillKDTree();
 };
 
 }; // namespace Tmpl8

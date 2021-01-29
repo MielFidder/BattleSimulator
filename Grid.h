@@ -9,11 +9,11 @@ public:
 	~Grid();
 
 	void CreateGrid(vec2 gsize);
-	void CheckTanksTiles();
+	void UpdateTanksInTiles();
 	vector<Tile*> GetSurroundedTiles(int tileIndex);
 	vec2 GetGsize() { return gsize; }
 	vector<Tile*> getTiles() { return tiles; }
-	int TileIndex(vec2 pos);
+	int GetTileIndex(vec2 pos);
 private:
 	vec2 gsize = NULL;
 	vector<Tile*> tiles;

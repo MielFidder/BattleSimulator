@@ -270,17 +270,24 @@ void Game::update(float deltaTime)
     //Update particle beams
     for (Particle_beam& particle_beam : particle_beams)
     {
+        int beamTileIndex = grid->TileIndex((particle_beam.min_position + particle_beam.max_position) / 2);
+        std::vector<Tank*> tileTanks = grid->getTiles()[beamTileIndex]->GetTanks();
 
-        particle_beam.tick(tanks);
-
-        //Damage all tanks within the damage window of the beam (the window is an axis-aligned bounding box)
-        for (Tank& tank : tanks)
+        //Check if rocket collides with enemy tank, spawn explosion and if tank is destroyed spawn a smoke plume
+        for (Tank* tank : tileTanks)
         {
-            if (tank.active && particle_beam.rectangle.intersects_circle(tank.get_position(), tank.get_collision_radius()))
+
+            particle_beam.tick(tanks);
+
+            //Damage all tanks within the damage window of the beam (the window is an axis-aligned bounding box)
+            for (Tank& tank : tanks)
             {
-                if (tank.hit(particle_beam.damage))
+                if (tank.active && particle_beam.rectangle.intersects_circle(tank.get_position(), tank.get_collision_radius()))
                 {
-                    smokes.push_back(Smoke(smoke, tank.position - vec2(0, 48)));
+                    if (tank.hit(particle_beam.damage))
+                    {
+                        smokes.push_back(Smoke(smoke, tank.position - vec2(0, 48)));
+                    }
                 }
             }
         }

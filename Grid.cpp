@@ -107,3 +107,25 @@ vector<Tile*> Grid::GetSurroundedTiles(int tileIndex) {
 
 	return surroundingTiles;
 }
+
+int Grid::TileIndex(vec2 pos)
+{
+	int indexX;
+	int indexY;
+	int index;
+
+	if (pos.x > SCRWIDTH) {
+		indexX = (GRIDROW - 1);
+	}
+	else
+		indexX = floor(pos.x / (SCRWIDTH / gsize.x));
+
+	if (pos.y > SCRHEIGHT) {
+		indexY = (GRIDCOL - 1);
+	}
+	else
+		indexY = floor(pos.y / (SCRWIDTH / gsize.x));
+
+	index = ((GRIDROW * indexY) + indexX);
+	return index;
+}

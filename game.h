@@ -61,6 +61,8 @@ class Game
     vector<Explosion> explosions;
     vector<Particle_beam> particle_beams;
 
+    float tsizeX, tsizeY;
+
     Grid* grid;
 
     Font* frame_count_font;

@@ -17,7 +17,7 @@
 #define MAX_FRAMES 2000
 
 //Global performance timer
-#define REF_PERFORMANCE 63648 //UPDATE THIS WITH YOUR REFERENCE PERFORMANCE (see console after 2k frames)
+#define REF_PERFORMANCE 31546 //UPDATE THIS WITH YOUR REFERENCE PERFORMANCE (see console after 2k frames)
 static timer perf_timer;
 static float duration;
 
@@ -47,7 +47,7 @@ const static float tank_radius = 8.5f;
 const static float rocket_radius = 10.f;
 
 ThreadPool tp(THREADCOUNT);
-
+std::mutex mut;
 
 // -----------------------------------------------------------
 // Initialize the application
@@ -161,32 +161,22 @@ Tank& Game::find_closest_enemy(Tank& current_tank)
     return tanks.at(closest_index);
 }
 
-// -----------------------------------------------------------
-// Update the game state:
-// Move all objects
-// Update sprite frames
-// Collision detection
-// Targeting etc..
-// -----------------------------------------------------------
-void Game::update(float deltaTime)
-{
-    //update grid
-    grid->UpdateTanksInTiles();
-
+void Game::updateTanks() {
     //Update tanks
     for (Tank& tank : tanks)
     {
+        int depth = 0;
         if (tank.active)
         {
             vector<Tile*> surroundingTiles = grid->GetSurroundedTiles(tank.getCurrentTileIndex());
+        
 
             for (int i = 0; i < (int)surroundingTiles.size(); i++) {
                 vector<Tank*> thisTileTanks = surroundingTiles[i]->GetTanks();
 
-                //voor elke tank in de tile zie hieronder
-
                 for (Tank* oTank : thisTileTanks)
                 {
+                    //std::cout << "normal in" << endl;
                     if (&tank == oTank) continue;
 
                     vec2 dir = tank.get_position() - oTank->get_position();
@@ -199,8 +189,11 @@ void Game::update(float deltaTime)
                     {
                         tank.push(dir.normalized(), 0.6f);
                     }
+                    //std::cout << "normal out" << endl;
                 }
+
             }
+          
 
             //Move tanks according to speed and nudges (see above) also reload
             tank.tick();
@@ -216,14 +209,9 @@ void Game::update(float deltaTime)
             }
         }
     }
+}
 
-
-    //Update smoke plumes
-    for (Smoke& smoke : smokes)
-    {
-        smoke.tick();
-    }
-
+void Game::updateRockets() {
     //Update rockets
     for (Rocket& rocket : rockets)
     {
@@ -259,6 +247,127 @@ void Game::update(float deltaTime)
 
     //Remove exploded rockets with remove erase idiom
     rockets.erase(std::remove_if(rockets.begin(), rockets.end(), [](const Rocket& rocket) { return !rocket.active; }), rockets.end());
+}
+
+vector<future<void>> futures;
+void Game::update_tanks()
+{
+    int workload = tanks.size();
+    int chunksize = tanks.size() / THREADCOUNT;
+    int start = 0;
+    int end = start + chunksize;
+    int remaining = workload % THREADCOUNT;
+    int currently_remaining = remaining;
+
+
+
+    for (size_t i = 0; i < THREADCOUNT; i++)
+    {
+        if (currently_remaining > 0) {
+            end++;
+            currently_remaining--;
+        }
+
+        futures.push_back(tp.enqueue([&] {
+            for (size_t j = 0; j < end; j++)
+            {
+                Tank& tank = tanks.at(j);
+                if (tank.active)
+                {
+                    vector<Tile*> surroundingTiles = grid->GetSurroundedTiles(tank.getCurrentTileIndex());
+
+
+                    for (int i = 0; i < (int)surroundingTiles.size(); i++) {
+                        vector<Tank*> thisTileTanks = surroundingTiles[i]->GetTanks();
+
+                        for (Tank* oTank : thisTileTanks)
+                        {
+                            if (&tank == oTank) continue;
+
+                            vec2 dir = tank.get_position() - oTank->get_position();
+                            float dirSquaredLen = dir.sqr_length();
+
+                            float colSquaredLen = (tank.get_collision_radius() + oTank->get_collision_radius());
+                            colSquaredLen *= colSquaredLen;
+
+                            if (dirSquaredLen < colSquaredLen)
+                            {
+                                tank.push(dir.normalized(), 0.6f);
+                            }
+                        }
+
+                    }
+
+
+                    //Move tanks according to speed and nudges (see above) also reload
+                    tank.tick();
+
+                    //Shoot at closest target if reloaded
+                    if (tank.rocket_reloaded())
+                    {
+                        Tank& target = find_closest_enemy(tank);
+
+                        rockets.push_back(Rocket(tank.position, (target.get_position() - tank.position).normalized() * 3, rocket_radius, tank.allignment, ((tank.allignment == RED) ? &rocket_red : &rocket_blue)));
+
+                        tank.reload_rocket();
+                    }
+                }
+
+            }
+            }));
+        start = end;
+        end += chunksize;
+    }
+
+    for (int i = 0; i < futures.size(); i++)
+    {
+        
+    }
+}
+
+
+// -----------------------------------------------------------
+// Update the game state:
+// Move all objects
+// Update sprite frames
+// Collision detection
+// Targeting etc..
+// -----------------------------------------------------------
+unsigned int depth = 0;
+void Game::update(float deltaTime)
+{
+    //update grid
+    grid->UpdateTanksInTiles();
+
+    if (depth <= THREADCOUNT) {
+        std::future<void> fut = tp.enqueue([&] {updateTanks(); });
+        depth++;
+        fut.wait();
+        depth--;
+    }
+    else {
+        updateTanks();
+    }
+
+    //Helaas is het niet gelukt om deze functie aan de praat te krijgen, maar we hebben besloten het er wel in te houden
+    //update_tanks();
+
+    //Update smoke plumes
+    for (Smoke& smoke : smokes)
+    {
+        smoke.tick();
+    }
+
+    if (depth <= THREADCOUNT) {
+        std::future<void> fut = tp.enqueue([&] {updateRockets(); });
+        depth++;
+        fut.wait();
+        depth--;
+    }
+    else {
+        updateRockets();
+    }
+
 
     //Update particle beams
     for (Particle_beam& particle_beam : particle_beams)
@@ -410,6 +519,7 @@ void Tmpl8::Game::merge_sort_tanks_health(std::vector<Tank*>& sorted_tanks, int 
         right.push_back(sorted_tanks.at(i));
     }
 
+
     if (pow(depth, 2) <= THREADCOUNT) {
         std::future<void> mergefut = tp.enqueue([&] {merge_sort_tanks_health(left, 0, (int)left.size(), (depth + 1)); });
         merge_sort_tanks_health(right, 0, (int)right.size(), (depth + 1));
@@ -420,6 +530,7 @@ void Tmpl8::Game::merge_sort_tanks_health(std::vector<Tank*>& sorted_tanks, int 
         merge_sort_tanks_health(left, 0, (int)left.size(), depth);
         merge_sort_tanks_health(right, 0, (int)right.size(), depth);
     }
+
 
     merge_tanks_health(left, right, sorted_tanks, begin, end);
 }
@@ -465,13 +576,21 @@ void Game::tick(float deltaTime)
         update(deltaTime);
     }
     //draw();
-    std::future<void> future = tp.enqueue([&]() { draw(); });
-    future.wait();
+    if (depth <= THREADCOUNT) {
+        std::future<void> future = tp.enqueue([&]() { draw(); });
+        depth++;
+        future.wait();
+        depth--;
+    }
+    else {
+        draw();
+    }
 
     measure_performance();
-
+  
     //Print frame count
     frame_count++;
     string frame_count_string = "FRAME: " + std::to_string(frame_count);
     frame_count_font->print(screen, frame_count_string.c_str(), 350, 580);
+
 }

@@ -18,6 +18,9 @@ class Game
     void draw();
     void tick(float deltaTime);
     void fillKDTree();
+    void updateTanks();
+    void updateRockets();
+    void update_tanks();
 
     //void insertion_sort_tanks_health(const std::vector<Tank>& original, std::vector<const Tank*>& sorted_tanks, int begin, int end);
     void merge_sort_tanks_health(std::vector<Tank*>& sorted_tanks, int begin, int end, int depth);
